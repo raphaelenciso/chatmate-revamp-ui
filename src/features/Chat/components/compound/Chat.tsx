@@ -6,13 +6,14 @@ import { MessageInput } from './MessageInput';
 import { TypingIndicator } from './TypingIndicator';
 import { ChatMessage } from './ChatMessage';
 import { ChatMessages } from './ChatMessages';
-import type { IContact } from '../../types/IContact';
+
 import type { IMessage } from '../../types/IChat';
 import { cn } from '@/lib/utils';
+import type { IUserContact } from '../../types/IUserContact';
 
 interface ChatProps {
   children: ReactNode;
-  contact?: IContact;
+  userContact?: IUserContact;
   messages: IMessage[];
   currentUserId: string;
   isTyping?: boolean;
@@ -35,7 +36,7 @@ interface ChatCompoundComponent {
  */
 const ChatRoot = ({
   children,
-  contact,
+  userContact,
   messages,
   currentUserId,
   isTyping = false,
@@ -43,11 +44,11 @@ const ChatRoot = ({
   className,
 }: ChatProps) => {
   // Show welcome screen if no contact is selected
-  if (!contact) {
+  if (!userContact) {
     return (
       <div
         className={cn(
-          'flex-1 flex items-center justify-center bg-background',
+          'flex-1 h-full flex items-center justify-center bg-background',
           className
         )}
       >
@@ -66,7 +67,7 @@ const ChatRoot = ({
 
   return (
     <ChatProvider
-      contact={contact}
+      userContact={userContact}
       messages={messages}
       currentUserId={currentUserId}
       isTyping={isTyping}
@@ -84,7 +85,7 @@ export const Chat = ChatRoot as ChatCompoundComponent;
 
 // Attach subcomponents to the main component
 Chat.Header = ChatHeader;
-Chat.Messages = ChatMessages;
-Chat.Input = MessageInput;
 Chat.Message = ChatMessage;
+Chat.Messages = ChatMessages;
 Chat.TypingIndicator = TypingIndicator;
+Chat.Input = MessageInput;

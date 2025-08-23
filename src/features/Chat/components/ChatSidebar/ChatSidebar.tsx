@@ -2,67 +2,72 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Users } from 'lucide-react';
+import { Search, Plus, Users, Sun, Moon } from 'lucide-react';
 import { getInitials } from '../../utils/stringHelpers';
 import Contact from './Contact';
 import { cn } from '@/lib/utils';
-
-interface Contact {
-  id: string;
-  name: string;
-  avatar: string;
-  status: 'online' | 'away' | 'busy' | 'offline';
-  lastMessage?: string;
-  unreadCount?: number;
-  lastSeen?: string;
-  isAI?: boolean;
-}
+import type { IUserContact } from '../../types/IUserContact';
+import useAuthStore from '@/stores/authStore';
+import useThemeStore from '@/stores/themeStore';
 
 interface ChatSidebarProps {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    avatar: string;
-  };
-  contacts: Contact[];
+  userContacts: IUserContact[];
   activeContactId?: string;
-  onContactSelect: (contact: Contact) => void;
-  onLogout: () => void;
+  onContactSelect: (userContact: IUserContact) => void;
   className?: string;
 }
 
 export const ChatSidebar = ({
-  user,
-  contacts,
+  userContacts,
   activeContactId,
   onContactSelect,
-  onLogout,
+
   className,
 }: ChatSidebarProps) => {
+  const user = useAuthStore((state) => state.user);
+  const theme = useThemeStore((state) => state.theme);
+  const setTheme = useThemeStore((state) => state.setTheme);
+
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredContacts = contacts.filter((contact) =>
+  const filteredContacts = userContacts.filter((contact) =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className={cn('relative w-full flex flex-col h-full', className)}>
-      <div className="py-3 px-4 flex flex-col gap-2">
+      <div className="p-3 flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <div className="text-lg  font-bold  flex items-center gap-2">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={user.avatar} alt={user.name} />
-              <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+              <AvatarImage src={user?.avatar || ''} alt={user?.name || ''} />
+              <AvatarFallback>{getInitials(user?.name || '')}</AvatarFallback>
             </Avatar>
-            <span className="text-primary">Chats</span>
+            <span>Chats</span>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="flex-1">
-              <Plus className="h-4 w-4 " />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex-1 rounded-full aspect-square size-4  !p-4 bg-primary-foreground"
+            >
+              <Plus className=" size-4 " />
             </Button>
-            <Button variant="outline" size="sm" className="flex-1">
-              <Users className="h-4 w-4 " />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex-1 rounded-full aspect-square size-4  !p-4 bg-primary-foreground"
+            >
+              <Users className="  " />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex-1 rounded-full aspect-square size-4  !p-4 bg-primary-foreground"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              <Sun className="size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </Button>
           </div>
         </div>
@@ -75,7 +80,7 @@ export const ChatSidebar = ({
               placeholder="Search conversations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 rounded-xl"
+              className="pl-10 rounded-full bg-primary-foreground"
             />
           </div>
         </div>
@@ -83,11 +88,11 @@ export const ChatSidebar = ({
 
       {/* Contacts List */}
       <div className="w-full  h-full overflow-y-auto px-2">
-        {filteredContacts.map((contact) => (
+        {filteredContacts.map((userContact) => (
           <Contact
-            key={contact.id}
-            contact={contact}
-            isActive={activeContactId === contact.id}
+            key={userContact.id}
+            userContact={userContact}
+            isActive={activeContactId === userContact.id}
             onSelect={onContactSelect}
           />
         ))}

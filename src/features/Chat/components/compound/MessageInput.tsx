@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Smile } from 'lucide-react';
+import { Smile } from 'lucide-react';
 import { useChatContext } from './ChatContext';
 import { cn } from '@/lib/utils';
+import { IoSend } from 'react-icons/io5';
 
 interface MessageInputProps {
   value?: string;
@@ -64,7 +65,7 @@ export const MessageInput = ({
 }: MessageInputProps) => {
   // Get context values for compound component usage
   const context = useChatContext();
-  const contextContact = context?.contact;
+  const contextContact = context?.userContact;
   const contextOnSend = context?.onSendMessage;
 
   // Internal state for compound component usage
@@ -72,7 +73,7 @@ export const MessageInput = ({
   const [showEmojis, setShowEmojis] = useState(false);
 
   // Use props if provided, otherwise use internal state (compound component usage)
-  const value = propValue !== undefined ? propValue : internalValue;
+  const value = propValue === undefined ? internalValue : propValue;
   const onChange = propOnChange || setInternalValue;
   const onSend = propOnSend || contextOnSend;
 
@@ -102,7 +103,7 @@ export const MessageInput = ({
   };
 
   return (
-    <div className="p-4 ">
+    <div className="p-3 ">
       {/* Emoji Picker */}
       {showEmojis && showEmojiPicker && (
         <div className="mb-3 p-3 bg-background border border-border rounded-lg">
@@ -151,8 +152,9 @@ export const MessageInput = ({
           variant="ghost"
           size="sm"
           disabled={!value.trim() || disabled}
+          className="!p-0"
         >
-          <Send className="h-4 w-4" />
+          <IoSend className="size-5 text-primary" />
         </Button>
       </form>
     </div>

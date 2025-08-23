@@ -1,22 +1,24 @@
 import { useState } from 'react';
 import { Chat } from './compound/Chat';
-import type { IContact } from '../types/IContact';
 import type { IMessage } from '../types/IChat';
+import type { IUserContact } from '../types/IUserContact';
 
 interface ChatWindowProps {
-  contact?: IContact;
+  userContact?: IUserContact;
   messages: IMessage[];
   currentUserId: string;
   onSendMessage: (content: string, type?: 'text' | 'image' | 'file') => void;
   className?: string;
+  onBackClick?: () => void;
 }
 
 export const ChatWindow = ({
-  contact,
+  userContact,
   messages,
   currentUserId,
   onSendMessage,
   className,
+  onBackClick,
 }: ChatWindowProps) => {
   const [isTyping, setIsTyping] = useState(false);
 
@@ -24,7 +26,7 @@ export const ChatWindow = ({
     onSendMessage(message);
 
     // Simulate AI response if chatting with AI
-    if (contact?.isAI) {
+    if (userContact?.isAI) {
       setIsTyping(true);
       setTimeout(() => {
         setIsTyping(false);
@@ -44,14 +46,14 @@ export const ChatWindow = ({
 
   return (
     <Chat
-      contact={contact}
+      userContact={userContact}
       messages={messages}
       currentUserId={currentUserId}
       isTyping={isTyping}
       onSendMessage={handleSendMessage}
       className={className}
     >
-      <Chat.Header />
+      <Chat.Header onBackClick={onBackClick} />
       <Chat.Messages />
       <Chat.Input />
     </Chat>

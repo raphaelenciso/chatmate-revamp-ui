@@ -9,7 +9,7 @@ import { TypingIndicator } from './TypingIndicator';
  * Automatically scrolls to bottom and handles typing indicator
  */
 export const ChatMessages = () => {
-  const { messages, currentUserId, contact, isTyping } = useChatContext();
+  const { messages, currentUserId, userContact, isTyping } = useChatContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -21,7 +21,7 @@ export const ChatMessages = () => {
   }, [messages, isTyping]);
 
   return (
-    <ScrollArea className="flex-1 p-4">
+    <ScrollArea className="flex-1 p-3">
       <div className="space-y-4">
         {messages.map((message) => {
           const isOwn = message.senderId === currentUserId;
@@ -31,7 +31,7 @@ export const ChatMessages = () => {
               key={message.id}
               message={message}
               isOwn={isOwn}
-              contact={contact}
+              userContact={userContact}
               currentUserId={currentUserId}
             />
           );

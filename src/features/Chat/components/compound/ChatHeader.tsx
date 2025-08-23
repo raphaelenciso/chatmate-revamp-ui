@@ -1,64 +1,53 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { MoreVertical, Bot } from 'lucide-react';
-import { getInitials } from '../../utils/stringHelpers';
+import { MoreVertical, ChevronLeft } from 'lucide-react';
 import { useChatContext } from './ChatContext';
-import type { IContact } from '../../types/IContact';
+import type { IUserContact } from '../../types/IUserContact';
+import AvatarWithStatus from '../AvatarWithStatus';
 
 interface ChatHeaderProps {
-  contact?: IContact;
+  userContact?: IUserContact;
   showCallButtons?: boolean;
   onMoreClick?: () => void;
+  onBackClick?: () => void;
 }
 
 /**
- * Reusable ChatHeader component for displaying chat contact info and actions
- * Shows contact avatar, name, status and optional action buttons
+ * Reusable ChatHeader component for displaying chat userContact info and actions
+ * Shows userContact avatar, name, status and optional action buttons
  */
 export const ChatHeader = ({
-  contact: propContact,
-  showCallButtons = false,
+  userContact: propContact,
   onMoreClick,
+  onBackClick,
 }: ChatHeaderProps) => {
-  // Use context contact if no prop contact is provided (compound component usage)
-  const contextContact = useChatContext()?.contact;
-  const contact = propContact || contextContact;
+  // Use context userContact if no prop userContact is provided (compound component usage)
+  const contextContact = useChatContext()?.userContact;
+  const userContact = propContact || contextContact;
 
-  if (!contact) {
+  if (!userContact) {
     return null;
   }
   return (
-    <div className="px-4 py-2 border-b border-border  flex items-center justify-between">
+    <div className="px-3 py-2 border-b border-border  flex items-center justify-between">
       <div className="flex items-center space-x-3">
-        <div className="relative">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={contact.avatar} alt={contact.name} />
-            <AvatarFallback>{getInitials(contact.name)}</AvatarFallback>
-          </Avatar>
-          {contact.isAI ? (
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-accent rounded-full flex items-center justify-center">
-              <Bot className="h-3 w-3 text-accent-foreground" />
-            </div>
-          ) : (
-            <div
-              className={`absolute -bottom-1 -right-1 w-4 h-4 ${
-                contact.status === 'online'
-                  ? 'bg-green-500'
-                  : contact.status === 'away'
-                    ? 'bg-yellow-500'
-                    : contact.status === 'busy'
-                      ? 'bg-red-500'
-                      : 'bg-muted'
-              } rounded-full`}
-            />
-          )}
-        </div>
+        <ChevronLeft
+          className="size-6 hover:cursor-pointer hover:opacity-75 text-primary block sm:hidden"
+          onClick={onBackClick}
+        />
+
+        <AvatarWithStatus
+          avatar={userContact.avatar}
+          name={userContact.name}
+          status={userContact.status}
+          isAI={userContact.isAI}
+          className="h-9 w-9"
+        />
         <div>
-          <h2 className="font-semibold text-sm">{contact.name}</h2>
+          <h2 className="font-semibold text-sm">{userContact.name}</h2>
           <p className="text-xs text-muted-foreground">
-            {contact.isAI
+            {userContact.isAI
               ? 'AI Assistant'
-              : contact.status === 'online'
+              : userContact.status === 'online'
                 ? 'Online'
                 : 'Last seen recently'}
           </p>

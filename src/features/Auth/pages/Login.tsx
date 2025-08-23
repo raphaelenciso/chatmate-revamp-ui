@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { MessageCircle, Mail, Lock, User, Chrome } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 
 export interface AuthScreenProps {
   onLogin?: (user: {
@@ -21,6 +22,8 @@ export interface AuthScreenProps {
 }
 
 export const LoginPage = ({ onLogin }: AuthScreenProps) => {
+  const navigate = useNavigate();
+
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
@@ -52,7 +55,7 @@ export const LoginPage = ({ onLogin }: AuthScreenProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Card className="w-full max-w-md shadow-elegant hover-glow">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
@@ -143,6 +146,9 @@ export const LoginPage = ({ onLogin }: AuthScreenProps) => {
             <Button
               type="submit"
               className="w-full bg-gradient-primary hover:opacity-75"
+              onClick={() => {
+                navigate({ to: '/chat' });
+              }}
             >
               {isLogin ? 'Sign In' : 'Create Account'}
             </Button>
