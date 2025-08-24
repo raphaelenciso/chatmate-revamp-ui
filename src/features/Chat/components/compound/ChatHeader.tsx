@@ -41,6 +41,7 @@ export const ChatHeader = ({
           status={userContact.status}
           isAI={userContact.isAI}
           className="h-9 w-9"
+          withStatus={false}
         />
         <div>
           <h2 className="font-semibold text-sm">{userContact.name}</h2>

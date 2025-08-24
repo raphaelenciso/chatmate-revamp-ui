@@ -23,6 +23,7 @@ const Contact = ({ userContact, isActive, onSelect }: ContactProps) => {
           name={userContact.name}
           status={userContact.status}
           isAI={userContact.isAI}
+          withStatus={false}
         />
       </div>
 

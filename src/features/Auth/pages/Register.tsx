@@ -36,6 +36,7 @@ export const RegisterPage = () => {
       username: '',
       email: '',
       password: '',
+      avatar: `https://avatar.iran.liara.run/public/${Math.floor(Math.random() * 100) + 1}`,
     },
   });
 
@@ -48,6 +49,7 @@ export const RegisterPage = () => {
         username: data.username,
         email: data.email,
         password: data.password,
+        avatar: data.avatar,
       });
 
       toast.success('Account created successfully!');

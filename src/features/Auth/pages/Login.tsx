@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -49,7 +50,7 @@ export const LoginPage = () => {
         password: data.password,
       });
 
-      const { id, username, email, avatar, role, access_token, refresh_token } =
+      const { id, username, email, avatar, role, accessToken, refreshToken } =
         response.data;
 
       // Create user object for auth store
@@ -57,18 +58,22 @@ export const LoginPage = () => {
         id,
         username,
         email,
-        avatar:
-          avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+        avatar,
         role,
-        access_token,
-        refresh_token,
+        accessToken,
+        refreshToken,
       };
       setUser(authUser);
 
       toast.success('Login successful!');
       navigate({ to: '/chat' });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
+      loginForm.setError('root', {
+        message:
+          error.response?.data?.message ||
+          'Registration failed. Please try again.',
+      });
     }
   };
 
@@ -120,13 +125,13 @@ export const LoginPage = () => {
                 name="usernameoremail"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Username or Email</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                         <Input
-                          type="email"
-                          placeholder="Enter your email"
+                          type="text"
+                          placeholder="Enter your username or email"
                           className="pl-10"
                           {...field}
                         />

@@ -2,18 +2,26 @@ import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Plus, Users, Sun, Moon } from 'lucide-react';
+import { Search, Plus, Sun, Moon } from 'lucide-react';
 import { getInitials } from '../../utils/stringHelpers';
 import Contact from './Contact';
 import { cn } from '@/lib/utils';
 import type { IUserContact } from '../../types/IUserContact';
 import { useAuthStore } from '@/stores/authStore';
 import useThemeStore from '@/stores/themeStore';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { NewChatDialog } from '../NewChatDialog';
 
 interface ChatSidebarProps {
   userContacts: IUserContact[];
   activeContactId?: string;
   onContactSelect: (userContact: IUserContact) => void;
+  onNewChat?: (userContact: IUserContact) => void;
   className?: string;
 }
 
@@ -21,45 +29,62 @@ export const ChatSidebar = ({
   userContacts,
   activeContactId,
   onContactSelect,
-
+  onNewChat,
   className,
 }: ChatSidebarProps) => {
   const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
   const theme = useThemeStore((state) => state.theme);
   const setTheme = useThemeStore((state) => state.setTheme);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false);
 
   const filteredContacts = userContacts.filter((contact) =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // useEffect(() => {
+  //   const fetchUsers = async () => {
+  //     const users = await getUsers({
+  //       username: searchQuery,
+  //       excludeSelf: true,
+  //     });
+  //     console.log(users);
+  //   };
+  //   fetchUsers();
+  // }, [searchQuery, getUsers]);
 
   return (
     <div className={cn('relative w-full flex flex-col h-full', className)}>
       <div className="p-3 flex flex-col gap-2">
         <div className="flex justify-between items-center">
           <div className="text-lg  font-bold  flex items-center gap-2">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={user?.avatar || ''} alt={user?.name || ''} />
-              <AvatarFallback>{getInitials(user?.name || '')}</AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="size-8 hover:cursor-pointer hover:opacity-80 transition-all">
+                  <AvatarImage
+                    src={user?.avatar || ''}
+                    alt={user?.username || ''}
+                  />
+                  <AvatarFallback className="text-xs font-semibold">
+                    {getInitials(user?.username || '')}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem
+                  className="text-xs cursor-pointer"
+                  onClick={() => setUser(null)}
+                >
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <span>Chats</span>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex-1 rounded-full aspect-square size-4  !p-4 bg-primary-foreground"
-            >
-              <Plus className=" size-4 " />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex-1 rounded-full aspect-square size-4  !p-4 bg-primary-foreground"
-            >
-              <Users className="  " />
-            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -69,6 +94,21 @@ export const ChatSidebar = ({
               <Sun className="size-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute size-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex-1 rounded-full aspect-square size-4  !p-4 bg-primary-foreground"
+              onClick={() => setIsNewChatDialogOpen(true)}
+            >
+              <Plus className=" size-4 " />
+            </Button>
+            {/* <Button
+              variant="ghost"
+              size="sm"
+              className="flex-1 rounded-full aspect-square size-4  !p-4 bg-primary-foreground"
+            >
+              <Users className="  " />
+            </Button> */}
           </div>
         </div>
 
@@ -97,6 +137,17 @@ export const ChatSidebar = ({
           />
         ))}
       </div>
+
+      {/* New Chat Dialog */}
+      <NewChatDialog
+        open={isNewChatDialogOpen}
+        onOpenChange={setIsNewChatDialogOpen}
+        onUserSelect={(userContact) => {
+          if (onNewChat) {
+            onNewChat(userContact);
+          }
+        }}
+      />
     </div>
   );
 };

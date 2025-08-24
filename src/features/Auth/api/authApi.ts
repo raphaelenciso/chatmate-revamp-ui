@@ -10,17 +10,19 @@ export const useAuthApi = () => {
   const { POST } = useAxios();
 
   const register = async (payload: IRegisterPayload) => {
-    return POST<IAuthResponse>({
+    const res = await POST<IAuthResponse>({
       url: '/api/auth/register',
       data: payload,
     });
+    return res.data;
   };
 
   const login = async (payload: ILoginPayload) => {
-    return POST<IAuthResponse>({
+    const res = await POST<IAuthResponse>({
       url: '/api/auth/login',
       data: payload,
     });
+    return res.data;
   };
 
   return {

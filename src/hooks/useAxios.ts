@@ -24,9 +24,9 @@ export const useAxios = () => {
 
   instance.interceptors.request.use(
     (request) => {
-      const { user } = useAuthStore.getState();
-      if (user?.access_token) {
-        request.headers.Authorization = `Bearer ${user.access_token}`;
+      const { user, isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        request.headers.Authorization = `Bearer ${user?.accessToken}`;
       }
 
       if (request.data instanceof FormData) {
@@ -70,13 +70,13 @@ export const useAxios = () => {
       ) {
         try {
           const { data } = await axios.post(`${API_URL}/api/auth/refresh`, {
-            refresh_token: user?.refresh_token,
+            refresh_token: user?.refreshToken,
           });
 
           setUser({
             ...(user as IUser),
-            access_token: data.access_token as string,
-            refresh_token: data?.refresh_token as string,
+            accessToken: data.accessToken as string,
+            refreshToken: data?.refreshToken as string,
           });
 
           const originalRequest = error.config;
