@@ -41,15 +41,20 @@ export const RegisterPage = () => {
   });
 
   // Handle signup form submission
-  const handleSignupSubmit = async (data: SignupFormData) => {
+  const handleSignupSubmit = async ({
+    username,
+    email,
+    password,
+    avatar,
+  }: SignupFormData) => {
     try {
       signupForm.clearErrors();
 
       await register({
-        username: data.username,
-        email: data.email,
-        password: data.password,
-        avatar: data.avatar,
+        username,
+        email,
+        password,
+        avatar,
       });
 
       toast.success('Account created successfully!');
