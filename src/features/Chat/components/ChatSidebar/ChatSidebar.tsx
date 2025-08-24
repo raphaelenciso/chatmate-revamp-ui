@@ -15,13 +15,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { NewChatDialog } from '../NewChatDialog';
 
 interface ChatSidebarProps {
   userContacts: IUserContact[];
   activeContactId?: string;
   onContactSelect: (userContact: IUserContact) => void;
-  onNewChat?: (userContact: IUserContact) => void;
+  setIsNewChatDialogOpen: (isOpen: boolean) => void;
+
   className?: string;
 }
 
@@ -29,7 +29,8 @@ export const ChatSidebar = ({
   userContacts,
   activeContactId,
   onContactSelect,
-  onNewChat,
+  setIsNewChatDialogOpen,
+
   className,
 }: ChatSidebarProps) => {
   const user = useAuthStore((state) => state.user);
@@ -38,7 +39,6 @@ export const ChatSidebar = ({
   const setTheme = useThemeStore((state) => state.setTheme);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false);
 
   const filteredContacts = userContacts.filter((contact) =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -137,17 +137,6 @@ export const ChatSidebar = ({
           />
         ))}
       </div>
-
-      {/* New Chat Dialog */}
-      <NewChatDialog
-        open={isNewChatDialogOpen}
-        onOpenChange={setIsNewChatDialogOpen}
-        onUserSelect={(userContact) => {
-          if (onNewChat) {
-            onNewChat(userContact);
-          }
-        }}
-      />
     </div>
   );
 };

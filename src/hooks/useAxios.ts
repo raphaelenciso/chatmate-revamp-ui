@@ -62,15 +62,13 @@ export const useAxios = () => {
       // IF TOKEN EXPIRED (but not for invalid credentials/password errors)
       if (
         error.response?.status === 401 &&
-        error.response.data?.server_response?.includes(
-          'Invalid token signature'
-        )
+        error.response.data.message?.includes('Invalid token signature')
         // &&
         // error.config?.url !== '/api/v1/user/profile' // Don't refresh for profile update errors
       ) {
         try {
           const { data } = await axios.post(`${API_URL}/api/auth/refresh`, {
-            refresh_token: user?.refreshToken,
+            refreshToken: user?.refreshToken,
           });
 
           setUser({

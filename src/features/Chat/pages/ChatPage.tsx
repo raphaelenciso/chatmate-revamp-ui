@@ -8,6 +8,7 @@ import { mockContacts } from '../constants/contacts';
 import { useAuthStore } from '@/stores/authStore';
 import { mockMessages } from '../constants/messages';
 import { cn } from '@/lib/utils';
+import { NewChatDialog } from '../components/NewChatDialog';
 
 interface Message {
   id: string;
@@ -28,6 +29,7 @@ export const ChatPage = () => {
   const [messages, setMessages] = useState<{ [contactId: string]: Message[] }>(
     mockMessages
   );
+  const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false);
 
   const handleContactSelect = (userContact: IUserContact) => {
     setActiveContact(userContact);
@@ -38,6 +40,26 @@ export const ChatPage = () => {
           c.id === userContact.id ? { ...c, unreadCount: 0 } : c
         )
       );
+    }
+  };
+
+  const handleOnUserSelect = (userContact: IUserContact) => {
+    // Check if contact already exists
+    const existingContact = userContacts.find((c) => c.id === userContact.id);
+
+    if (existingContact) {
+      // If contact exists, just select it
+      setActiveContact(existingContact);
+    } else {
+      // Add new contact to the list
+      setUserContacts((prev) => [userContact, ...prev]);
+      setActiveContact(userContact);
+
+      // // Initialize empty messages for this contact
+      // setMessages((prev) => ({
+      //   ...prev,
+      //   [userContact.id]: [],
+      // }));
     }
   };
 
@@ -68,33 +90,13 @@ export const ChatPage = () => {
     );
   };
 
-  const handleNewChat = (userContact: IUserContact) => {
-    // Check if contact already exists
-    const existingContact = userContacts.find((c) => c.id === userContact.id);
-
-    if (existingContact) {
-      // If contact exists, just select it
-      setActiveContact(existingContact);
-    } else {
-      // Add new contact to the list
-      setUserContacts((prev) => [userContact, ...prev]);
-      setActiveContact(userContact);
-
-      // Initialize empty messages for this contact
-      setMessages((prev) => ({
-        ...prev,
-        [userContact.id]: [],
-      }));
-    }
-  };
-
   return (
     <div className="h-screen max-h-screen flex gap-2 bg-muted p-3 overflow-hidden ">
       <ChatSidebar
         userContacts={userContacts}
         activeContactId={activeContact?.id}
         onContactSelect={handleContactSelect}
-        onNewChat={handleNewChat}
+        setIsNewChatDialogOpen={setIsNewChatDialogOpen}
         className={cn(
           'flex-1 rounded-xl bg-background overflow-hidden',
           !!activeContact?.id && 'hidden sm:flex'
@@ -111,6 +113,13 @@ export const ChatPage = () => {
           'flex-[3] rounded-xl bg-background overflow-hidden',
           !activeContact?.id && 'hidden sm:block'
         )}
+      />
+
+      {/* New Chat Dialog */}
+      <NewChatDialog
+        isOpen={isNewChatDialogOpen}
+        setIsOpen={setIsNewChatDialogOpen}
+        onUserSelect={handleOnUserSelect}
       />
     </div>
   );

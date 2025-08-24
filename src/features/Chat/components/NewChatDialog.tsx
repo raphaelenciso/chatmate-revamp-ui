@@ -16,14 +16,14 @@ import type { IUser } from '@/types/IUser';
 import type { IUserContact } from '../types/IUserContact';
 
 interface NewChatDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
   onUserSelect: (user: IUserContact) => void;
 }
 
 export const NewChatDialog = ({
-  open,
-  onOpenChange,
+  isOpen,
+  setIsOpen,
   onUserSelect,
 }: NewChatDialogProps) => {
   const { getUsers } = useUsersApi();
@@ -69,21 +69,21 @@ export const NewChatDialog = ({
   const handleUserSelect = (user: IUser) => {
     const userContact = convertToUserContact(user);
     onUserSelect(userContact);
-    onOpenChange(false);
+    setIsOpen(false);
     setSearchQuery('');
     setUsers([]);
   };
 
   const handleOpenChange = (newOpen: boolean) => {
-    onOpenChange(newOpen);
     if (!newOpen) {
+      setIsOpen(false);
       setSearchQuery('');
       setUsers([]);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Start New Chat</DialogTitle>

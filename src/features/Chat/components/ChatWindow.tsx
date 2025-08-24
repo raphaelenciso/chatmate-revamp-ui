@@ -44,6 +44,8 @@ export const ChatWindow = ({
     }
   };
 
+  console.log(messages);
+
   return (
     <Chat
       userContact={userContact}
