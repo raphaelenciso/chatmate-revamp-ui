@@ -7,7 +7,7 @@ import { getInitials } from '../../utils/stringHelpers';
 import Contact from './Contact';
 import { cn } from '@/lib/utils';
 import type { IUserContact } from '../../types/IUserContact';
-import useAuthStore from '@/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import useThemeStore from '@/stores/themeStore';
 
 interface ChatSidebarProps {

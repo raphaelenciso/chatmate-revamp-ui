@@ -5,7 +5,7 @@ import { ChatWindow } from '../components/ChatWindow';
 
 import type { IUserContact } from '../types/IUserContact';
 import { mockContacts } from '../constants/contacts';
-import useAuthStore from '@/stores/authStore';
+import { useAuthStore } from '@/stores/authStore';
 import { mockMessages } from '../constants/messages';
 import { cn } from '@/lib/utils';
 

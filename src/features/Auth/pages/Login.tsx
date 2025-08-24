@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -8,9 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { MessageCircle, Mail, Lock, User, Chrome } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
+import {
+  loginSchema,
+  signupSchema,
+  type LoginFormData,
+  type SignupFormData,
+} from '../schemas/authSchemas';
+import { useAuthApi } from '../api/authApi';
+import { useAuthStore } from '@/stores/authStore';
+import { toast } from 'sonner';
 
 export interface AuthScreenProps {
   onLogin?: (user: {
@@ -23,24 +42,128 @@ export interface AuthScreenProps {
 
 export const LoginPage = ({ onLogin }: AuthScreenProps) => {
   const navigate = useNavigate();
-
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
+  const { login, register } = useAuthApi();
+  const setUser = useAuthStore((state) => state.setUser);
+
+  // Initialize forms with React Hook Form and Zod validation
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock authentication - replace with real auth when integrating backend
-    const mockUser = {
-      id: 'user_' + Date.now(),
-      name: formData.name || 'User',
-      email: formData.email || 'user@example.com',
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${formData.email}`,
-    };
-    onLogin?.(mockUser);
+  const signupForm = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  });
+
+  // Handle login form submission
+  const handleLoginSubmit = async (data: LoginFormData) => {
+    try {
+      loginForm.clearErrors();
+
+      const response = await login({
+        usernameoremail: data.email,
+        password: data.password,
+      });
+
+      const { user, access_token, refresh_token } = response.data;
+
+      // Create user object for auth store
+      const authUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar:
+          user.avatar ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
+        role: user.role,
+        access_token,
+        refresh_token,
+      };
+
+      // Update auth store
+      setUser(authUser);
+
+      // Call onLogin callback if provided
+      onLogin?.(authUser);
+
+      toast.success('Login successful!');
+      navigate({ to: '/chat' });
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
+
+  // Handle signup form submission
+  const handleSignupSubmit = async (data: SignupFormData) => {
+    try {
+      signupForm.clearErrors();
+
+      const response = await register({
+        username: data.name,
+        email: data.email,
+        password: data.password,
+      });
+
+      const { user, access_token, refresh_token } = response.data;
+
+      // Create user object for auth store
+      const authUser = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        avatar:
+          user.avatar ||
+          `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`,
+        role: user.role,
+        access_token,
+        refresh_token,
+      };
+
+      // Update auth store
+      setUser(authUser);
+
+      // Call onLogin callback if provided
+      onLogin?.(authUser);
+
+      toast.success('Account created successfully!');
+      navigate({ to: '/chat' });
+    } catch (error) {
+      console.error('Registration error:', error);
+
+      // Handle specific validation errors
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as {
+          response?: { status?: number; data?: { server_response?: string } };
+        };
+        if (axiosError.response?.status === 400) {
+          const errorMessage = axiosError.response?.data?.server_response;
+
+          if (errorMessage?.includes('email')) {
+            signupForm.setError('email', {
+              message: errorMessage,
+            });
+          } else if (errorMessage?.includes('username')) {
+            signupForm.setError('name', {
+              message: errorMessage,
+            });
+          } else {
+            signupForm.setError('root', {
+              message: errorMessage || 'Registration failed. Please try again.',
+            });
+          }
+        }
+      }
+      // Other errors are handled by useAxios interceptor (toast notifications)
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -89,70 +212,169 @@ export const LoginPage = ({ onLogin }: AuthScreenProps) => {
             </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div className="space-y-2">
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="Full Name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, name: e.target.value }))
-                    }
-                    className="pl-10"
-                    required={!isLogin}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, email: e.target.value }))
-                  }
-                  className="pl-10"
-                  required
+          {/* Login Form */}
+          {isLogin && (
+            <Form {...loginForm}>
+              <form
+                onSubmit={loginForm.handleSubmit(handleLoginSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                          <Input
+                            type="email"
+                            placeholder="Enter your email"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-            </div>
 
-            <div className="space-y-2">
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      password: e.target.value,
-                    }))
-                  }
-                  className="pl-10"
-                  required
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                          <Input
+                            type="password"
+                            placeholder="Enter your password"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-            </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-gradient-primary hover:opacity-75"
-              onClick={() => {
-                navigate({ to: '/chat' });
-              }}
-            >
-              {isLogin ? 'Sign In' : 'Create Account'}
-            </Button>
-          </form>
+                {/* Display form-level errors */}
+                {loginForm.formState.errors.root && (
+                  <div className="text-sm text-destructive text-center">
+                    {loginForm.formState.errors.root.message}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-primary hover:opacity-75"
+                  disabled={loginForm.formState.isSubmitting}
+                >
+                  {loginForm.formState.isSubmitting
+                    ? 'Signing In...'
+                    : 'Sign In'}
+                </Button>
+              </form>
+            </Form>
+          )}
+
+          {/* Signup Form */}
+          {!isLogin && (
+            <Form {...signupForm}>
+              <form
+                onSubmit={signupForm.handleSubmit(handleSignupSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={signupForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                          <Input
+                            type="text"
+                            placeholder="Enter your full name"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={signupForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                          <Input
+                            type="email"
+                            placeholder="Enter your email"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={signupForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                          <Input
+                            type="password"
+                            placeholder="Enter your password"
+                            className="pl-10"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Display form-level errors */}
+                {signupForm.formState.errors.root && (
+                  <div className="text-sm text-destructive text-center">
+                    {signupForm.formState.errors.root.message}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  className="w-full bg-gradient-primary hover:opacity-75"
+                  disabled={signupForm.formState.isSubmitting}
+                >
+                  {signupForm.formState.isSubmitting
+                    ? 'Creating Account...'
+                    : 'Create Account'}
+                </Button>
+              </form>
+            </Form>
+          )}
 
           <div className="text-center">
             <button
