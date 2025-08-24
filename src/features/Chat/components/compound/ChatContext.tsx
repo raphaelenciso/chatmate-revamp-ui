@@ -1,13 +1,13 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import type { IUserContact } from '../../types/IUserContact';
-import type { IMessage } from '../../types/IChat';
+import type { IMessage } from '../../types/IMessage';
 
 interface ChatContextValue {
   userContact?: IUserContact;
   messages: IMessage[];
   currentUserId: string;
   isTyping: boolean;
-  onSendMessage: (content: string, type?: 'text' | 'image' | 'file') => void;
+  onSendMessage: (content: string, contentType?: 'text' | 'image') => void;
 }
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
@@ -18,7 +18,7 @@ interface ChatProviderProps {
   messages: IMessage[];
   currentUserId: string;
   isTyping: boolean;
-  onSendMessage: (content: string, type?: 'text' | 'image' | 'file') => void;
+  onSendMessage: (content: string, contentType?: 'text' | 'image') => void;
 }
 
 /**

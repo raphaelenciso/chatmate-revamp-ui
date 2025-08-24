@@ -4,19 +4,12 @@ import { ChatSidebar } from '../components/ChatSidebar/ChatSidebar';
 import { ChatWindow } from '../components/ChatWindow';
 
 import type { IUserContact } from '../types/IUserContact';
+import type { IMessage } from '../types/IMessage';
 import { mockContacts } from '../constants/contacts';
 import { useAuthStore } from '@/stores/authStore';
 import { mockMessages } from '../constants/messages';
 import { cn } from '@/lib/utils';
 import { NewChatDialog } from '../components/NewChatDialog';
-
-interface Message {
-  id: string;
-  content: string;
-  senderId: string;
-  timestamp: Date;
-  type: 'text' | 'image' | 'file';
-}
 
 export const ChatPage = () => {
   const { user } = useAuthStore();
@@ -26,7 +19,7 @@ export const ChatPage = () => {
   const [activeContact, setActiveContact] = useState<
     IUserContact | undefined
   >();
-  const [messages, setMessages] = useState<{ [contactId: string]: Message[] }>(
+  const [messages, setMessages] = useState<{ [contactId: string]: IMessage[] }>(
     mockMessages
   );
   const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false);
@@ -34,13 +27,13 @@ export const ChatPage = () => {
   const handleContactSelect = (userContact: IUserContact) => {
     setActiveContact(userContact);
     // Mark messages as read
-    if (userContact.unreadCount) {
-      setUserContacts((prev) =>
-        prev.map((c) =>
-          c.id === userContact.id ? { ...c, unreadCount: 0 } : c
-        )
-      );
-    }
+    // if (userContact.unreadCount) {
+    //   setUserContacts((prev) =>
+    //     prev.map((c) =>
+    //       c.id === userContact.id ? { ...c, unreadCount: 0 } : c
+    //     )
+    //   );
+    // }
   };
 
   const handleOnUserSelect = (userContact: IUserContact) => {
@@ -56,25 +49,26 @@ export const ChatPage = () => {
       setActiveContact(userContact);
 
       // // Initialize empty messages for this contact
-      // setMessages((prev) => ({
-      //   ...prev,
-      //   [userContact.id]: [],
-      // }));
+      setMessages((prev) => ({
+        ...prev,
+        [userContact.id]: [],
+      }));
     }
   };
 
   const handleSendMessage = (
     content: string,
-    type: 'text' | 'image' | 'file' = 'text'
+    contentType: 'text' | 'image' = 'text'
   ) => {
     if (!user || !activeContact) return;
 
-    const newMessage: Message = {
+    const newMessage: IMessage = {
       id: `msg_${Date.now()}`,
       content,
       senderId: user.id,
-      timestamp: new Date(),
-      type,
+      role: 'user',
+      contentType,
+      timestamp: new Date().toISOString(),
     };
 
     setMessages((prev) => ({

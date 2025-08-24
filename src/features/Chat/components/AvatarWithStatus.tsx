@@ -6,10 +6,9 @@ import { cn } from '@/lib/utils';
 interface AvatarWithStatusProps {
   avatar: string;
   name: string;
-  status: string;
+  status?: string;
   isAI?: boolean;
   className?: string;
-  withStatus?: boolean;
 }
 
 const AvatarWithStatus = ({
@@ -18,7 +17,6 @@ const AvatarWithStatus = ({
   status,
   isAI,
   className,
-  withStatus = true,
 }: AvatarWithStatusProps) => {
   // Helper function to get status indicator color
   const getStatusColor = (status: string) => {
@@ -49,7 +47,7 @@ const AvatarWithStatus = ({
           <Bot className="h-3 w-3 text-accent-foreground" />
         </div>
       ) : (
-        withStatus && (
+        status && (
           <div
             className={`absolute -bottom-1 -right-1 size-3 ${getStatusColor(status)} rounded-full`}
           ></div>

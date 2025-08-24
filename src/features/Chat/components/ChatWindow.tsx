@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Chat } from './compound/Chat';
-import type { IMessage } from '../types/IChat';
+import type { IMessage } from '../types/IMessage';
 import type { IUserContact } from '../types/IUserContact';
 
 interface ChatWindowProps {
   userContact?: IUserContact;
   messages: IMessage[];
   currentUserId: string;
-  onSendMessage: (content: string, type?: 'text' | 'image' | 'file') => void;
+  onSendMessage: (content: string, contentType?: 'text' | 'image') => void;
   className?: string;
   onBackClick?: () => void;
 }
@@ -26,7 +26,7 @@ export const ChatWindow = ({
     onSendMessage(message);
 
     // Simulate AI response if chatting with AI
-    if (userContact?.isAI) {
+    if (userContact?.id === 'ai-assistant') {
       setIsTyping(true);
       setTimeout(() => {
         setIsTyping(false);
@@ -39,12 +39,10 @@ export const ChatWindow = ({
         ];
         const randomResponse =
           aiResponses[Math.floor(Math.random() * aiResponses.length)];
-        onSendMessage(randomResponse);
+        onSendMessage(randomResponse, 'text');
       }, 1500);
     }
   };
-
-  console.log(messages);
 
   return (
     <Chat

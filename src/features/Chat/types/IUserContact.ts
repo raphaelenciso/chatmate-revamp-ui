@@ -1,13 +1,11 @@
-import type { IUser } from '@/types/IUser';
-
-export interface IUserContact extends IUser {
+export interface IUserContact {
   id: string;
-  name: string;
+  username: string;
   email: string;
   avatar: string;
-  status: 'online' | 'away' | 'busy' | 'offline';
-  lastMessage?: string;
-  unreadCount?: number;
-  lastSeen?: string;
-  isAI?: boolean;
+  // status: 'online' | 'away' | 'busy' | 'offline';
+  // lastMessage?: string;
+  // unreadCount?: number;
+  // lastSeen?: string;
+  // isAI?: boolean;
 }

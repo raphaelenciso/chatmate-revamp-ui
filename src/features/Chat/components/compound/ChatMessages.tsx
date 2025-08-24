@@ -1,5 +1,4 @@
 import { useRef, useEffect } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useChatContext } from './ChatContext';
 import { ChatMessage } from './ChatMessage';
 import { TypingIndicator } from './TypingIndicator';
@@ -21,7 +20,7 @@ export const ChatMessages = () => {
   }, [messages, isTyping]);
 
   return (
-    <ScrollArea className="flex-1 p-3">
+    <div className="h-full p-3 flex flex-col-reverse overflow-y-auto my-12 ">
       <div className="space-y-4">
         {messages.map((message) => {
           const isOwn = message.senderId === currentUserId;
@@ -41,6 +40,6 @@ export const ChatMessages = () => {
 
         <div ref={messagesEndRef} />
       </div>
-    </ScrollArea>
+    </div>
   );
 };

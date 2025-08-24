@@ -40,10 +40,6 @@ export const ChatSidebar = ({
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredContacts = userContacts.filter((contact) =>
-    contact.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   // useEffect(() => {
   //   const fetchUsers = async () => {
   //     const users = await getUsers({
@@ -128,7 +124,7 @@ export const ChatSidebar = ({
 
       {/* Contacts List */}
       <div className="w-full  h-full overflow-y-auto px-2">
-        {filteredContacts.map((userContact) => (
+        {userContacts.map((userContact) => (
           <Contact
             key={userContact.id}
             userContact={userContact}

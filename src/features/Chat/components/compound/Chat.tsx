@@ -7,7 +7,7 @@ import { TypingIndicator } from './TypingIndicator';
 import { ChatMessage } from './ChatMessage';
 import { ChatMessages } from './ChatMessages';
 
-import type { IMessage } from '../../types/IChat';
+import type { IMessage } from '../../types/IMessage';
 import { cn } from '@/lib/utils';
 import type { IUserContact } from '../../types/IUserContact';
 
@@ -17,7 +17,7 @@ interface ChatProps {
   messages: IMessage[];
   currentUserId: string;
   isTyping?: boolean;
-  onSendMessage: (content: string, type?: 'text' | 'image' | 'file') => void;
+  onSendMessage: (content: string, contentType?: 'text' | 'image') => void;
   className?: string;
 }
 
@@ -73,7 +73,7 @@ const ChatRoot = ({
       isTyping={isTyping}
       onSendMessage={onSendMessage}
     >
-      <div className={cn('flex-1 flex flex-col h-full', className)}>
+      <div className={cn('flex-1 flex flex-col h-full relative', className)}>
         {children}
       </div>
     </ChatProvider>

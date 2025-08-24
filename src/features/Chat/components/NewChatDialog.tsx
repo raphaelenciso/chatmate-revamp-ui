@@ -58,17 +58,8 @@ export const NewChatDialog = ({
     searchUsers();
   }, [searchQuery]);
 
-  // Convert IUser to IUserContact
-  const convertToUserContact = (user: IUser): IUserContact => ({
-    ...user,
-    name: user.username,
-    status: 'offline' as const,
-    unreadCount: 0,
-  });
-
   const handleUserSelect = (user: IUser) => {
-    const userContact = convertToUserContact(user);
-    onUserSelect(userContact);
+    onUserSelect(user);
     setIsOpen(false);
     setSearchQuery('');
     setUsers([]);

@@ -1,5 +1,5 @@
 import { formatTime } from '../../utils/dateHelpers';
-import type { IMessage } from '../../types/IChat';
+import type { IMessage } from '../../types/IMessage';
 import type { IUserContact } from '../../types/IUserContact';
 
 interface ChatMessageProps {
@@ -18,7 +18,10 @@ export const ChatMessage = ({
   isOwn,
   userContact,
 }: ChatMessageProps) => {
-  const isAI = message.senderId === userContact?.id && userContact?.isAI;
+  const isAI =
+    message.role === 'bot' ||
+    (message.senderId === userContact?.id &&
+      userContact?.id === 'ai-assistant');
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>

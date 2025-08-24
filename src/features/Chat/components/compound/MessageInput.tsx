@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Smile } from 'lucide-react';
 import { useChatContext } from './ChatContext';
 import { cn } from '@/lib/utils';
 import { IoSend } from 'react-icons/io5';
@@ -9,47 +8,11 @@ import { IoSend } from 'react-icons/io5';
 interface MessageInputProps {
   value?: string;
   onChange?: (value: string) => void;
-  onSend?: (message: string) => void;
+  onSend?: (message: string, contentType?: 'text' | 'image') => void;
   placeholder?: string;
   disabled?: boolean;
   showEmojiPicker?: boolean;
 }
-
-// Common emojis for quick access
-const COMMON_EMOJIS = [
-  '😀',
-  '😂',
-  '😍',
-  '🥰',
-  '😊',
-  '😎',
-  '🤔',
-  '😢',
-  '😭',
-  '😡',
-  '🤯',
-  '😴',
-  '🤗',
-  '🙄',
-  '😬',
-  '🤐',
-  '👍',
-  '👎',
-  '👌',
-  '✌️',
-  '🤞',
-  '👏',
-  '🙌',
-  '🤝',
-  '❤️',
-  '💕',
-  '💯',
-  '🔥',
-  '⭐',
-  '✨',
-  '🎉',
-  '🎊',
-];
 
 /**
  * Reusable MessageInput component for sending messages
@@ -70,7 +33,6 @@ export const MessageInput = ({
 
   // Internal state for compound component usage
   const [internalValue, setInternalValue] = useState('');
-  const [showEmojis, setShowEmojis] = useState(false);
 
   // Use props if provided, otherwise use internal state (compound component usage)
   const value = propValue === undefined ? internalValue : propValue;
@@ -79,13 +41,13 @@ export const MessageInput = ({
 
   // Generate placeholder based on context if not provided
   const finalPlaceholder = contextContact
-    ? `Message ${contextContact.name}...`
+    ? `Message ${contextContact.username}...`
     : placeholder;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (value.trim() && !disabled && onSend) {
-      onSend(value.trim());
+      onSend(value.trim(), 'text');
       // Clear internal value if using compound component
       if (propValue === undefined) {
         setInternalValue('');
@@ -93,19 +55,10 @@ export const MessageInput = ({
     }
   };
 
-  const handleEmojiClick = (emoji: string) => {
-    onChange(value + emoji);
-    setShowEmojis(false);
-  };
-
-  const toggleEmojiPicker = () => {
-    setShowEmojis(!showEmojis);
-  };
-
   return (
-    <div className="p-3 ">
+    <div className="px-3 py-2 bg-white absolute bottom-0 w-full h-12  flex items-center justify-center z-10 ">
       {/* Emoji Picker */}
-      {showEmojis && showEmojiPicker && (
+      {/* {showEmojis && showEmojiPicker && (
         <div className="mb-3 p-3 bg-background border border-border rounded-lg">
           <div className="grid grid-cols-8 gap-2">
             {COMMON_EMOJIS.map((emoji) => (
@@ -120,11 +73,14 @@ export const MessageInput = ({
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="flex items-center space-x-2">
-        <div className="flex-1 relative">
+      <form
+        onSubmit={handleSubmit}
+        className="flex items-center justify-center space-x-2 w-full"
+      >
+        <div className="w-full relative">
           <Input
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -135,7 +91,7 @@ export const MessageInput = ({
               showEmojiPicker ? 'pr-10' : ''
             )}
           />
-          {showEmojiPicker && (
+          {/* {showEmojiPicker && (
             <Button
               type="button"
               variant="ghost"
@@ -145,7 +101,7 @@ export const MessageInput = ({
             >
               <Smile className="h-4 w-4" />
             </Button>
-          )}
+          )} */}
         </div>
         <Button
           type="submit"

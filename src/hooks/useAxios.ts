@@ -73,8 +73,8 @@ export const useAxios = () => {
 
           setUser({
             ...(user as IUser),
-            accessToken: data.accessToken as string,
-            refreshToken: data?.refreshToken as string,
+            accessToken: data.data.accessToken as string,
+            refreshToken: data.data?.refreshToken as string,
           });
 
           const originalRequest = error.config;

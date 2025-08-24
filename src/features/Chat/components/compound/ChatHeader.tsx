@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { MoreVertical, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useChatContext } from './ChatContext';
 import type { IUserContact } from '../../types/IUserContact';
 import AvatarWithStatus from '../AvatarWithStatus';
@@ -7,7 +6,6 @@ import AvatarWithStatus from '../AvatarWithStatus';
 interface ChatHeaderProps {
   userContact?: IUserContact;
   showCallButtons?: boolean;
-  onMoreClick?: () => void;
   onBackClick?: () => void;
 }
 
@@ -17,7 +15,7 @@ interface ChatHeaderProps {
  */
 export const ChatHeader = ({
   userContact: propContact,
-  onMoreClick,
+
   onBackClick,
 }: ChatHeaderProps) => {
   // Use context userContact if no prop userContact is provided (compound component usage)
@@ -28,7 +26,7 @@ export const ChatHeader = ({
     return null;
   }
   return (
-    <div className="px-3 py-2 border-b border-border  flex items-center justify-between">
+    <div className="absolute top-0 left-0 w-full px-3 py-2 border-b border-border  flex items-center justify-between h-12 z-10 bg-white">
       <div className="flex items-center space-x-3">
         <ChevronLeft
           className="size-6 hover:cursor-pointer hover:opacity-75 text-primary block sm:hidden"
@@ -37,28 +35,12 @@ export const ChatHeader = ({
 
         <AvatarWithStatus
           avatar={userContact.avatar}
-          name={userContact.name}
-          status={userContact.status}
-          isAI={userContact.isAI}
+          name={userContact.username}
           className="h-9 w-9"
-          withStatus={false}
         />
         <div>
-          <h2 className="font-semibold text-sm">{userContact.name}</h2>
-          <p className="text-xs text-muted-foreground">
-            {userContact.isAI
-              ? 'AI Assistant'
-              : userContact.status === 'online'
-                ? 'Online'
-                : 'Last seen recently'}
-          </p>
+          <h2 className="font-semibold text-sm">{userContact.username}</h2>
         </div>
-      </div>
-
-      <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="sm" onClick={onMoreClick}>
-          <MoreVertical className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   );
