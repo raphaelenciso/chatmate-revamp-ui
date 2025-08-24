@@ -2,10 +2,7 @@ import { z } from 'zod';
 
 // Login form schema
 export const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Please enter a valid email address'),
+  usernameoremail: z.string().min(1, 'Username or email is required'),
   password: z
     .string()
     .min(1, 'Password is required')
@@ -14,15 +11,12 @@ export const loginSchema = z.object({
 
 // Signup form schema
 export const signupSchema = z.object({
-  name: z
+  username: z
     .string()
-    .min(1, 'Name is required')
-    .min(2, 'Name must be at least 2 characters long')
-    .max(50, 'Name must be less than 50 characters'),
-  email: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Please enter a valid email address'),
+    .min(1, 'Username is required')
+    .min(3, 'Username must be at least 3 characters long')
+    .max(50, 'Username must be less than 50 characters'),
+  email: z.email('Please enter a valid email address'),
   password: z
     .string()
     .min(1, 'Password is required')

@@ -11,13 +11,11 @@ export interface IRegisterPayload {
 
 // API Response types
 export interface IAuthResponse {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-    role: string;
-  };
+  id: string;
+  username: string;
+  email: string;
+  avatar?: string;
+  role: string;
   access_token: string;
   refresh_token: string;
 }

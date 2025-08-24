@@ -6,23 +6,13 @@ import type { IAxios } from '@/types/IAxios';
 import { API_URL } from '@/lib/config';
 import { useAuthStore } from '@/stores/authStore';
 
-// const URL_WITHOUT_TOAST = new Set(['/login']);
+// Routes that should not show toast errors
+const ROUTES_WITHOUT_TOAST = new Set(['/api/auth/login', '/api/auth/register']);
 
-// const errorRoutesWithoutToast = ({
-//   errorMessage,
-//   status,
-//   url,
-// }: {
-//   errorMessage: string;
-//   status: number;
-//   url: string;
-// }) => {
-//   return (
-//     (status === 403 && errorMessage === 'User not registered') ||
-//     (status === 404 && URL_WITHOUT_TOAST.has(url)) ||
-//     errorMessage === 'No Translated Sentence Found'
-//   );
-// };
+// Check if route should be excluded from toast errors
+const shouldExcludeFromToast = (url: string): boolean => {
+  return ROUTES_WITHOUT_TOAST.has(url);
+};
 
 export const useAxios = () => {
   const instance = axios.create({
@@ -99,7 +89,12 @@ export const useAxios = () => {
         }
       }
 
-      toast.error(error.response?.data?.server_response || error.message);
+      // Only show toast error if route is not excluded
+      if (!shouldExcludeFromToast(error.config?.url || '')) {
+        toast.error(
+          error.response?.data?.server_response || error.response?.data?.message
+        );
+      }
       throw error;
     }
   );

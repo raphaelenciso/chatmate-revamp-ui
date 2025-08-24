@@ -113,6 +113,8 @@ export default tseslint.config([
       'unicorn/text-encoding-identifier-case': 'warn',
       'unicorn/throw-new-error': 'error',
       'unicorn/prefer-number-properties': 'off',
+      'unicorn/no-negated-condition': 'off',
+      'react-refresh/only-export-components': 'off',
     },
   },
 ]);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
@@ -18,62 +19,52 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
-import { MessageCircle, Mail, Lock, Chrome } from 'lucide-react';
+import { MessageCircle, Mail, Lock, User, Chrome } from 'lucide-react';
 import { useNavigate, Link } from '@tanstack/react-router';
-import { loginSchema, type LoginFormData } from '../schemas/authSchemas';
+import { signupSchema, type SignupFormData } from '../schemas/authSchemas';
 import { useAuthApi } from '../api/authApi';
-import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 
-export const LoginPage = () => {
+export const RegisterPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuthApi();
-  const setUser = useAuthStore((state) => state.setUser);
+  const { register } = useAuthApi();
 
   // Initialize form with React Hook Form and Zod validation
-  const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  const signupForm = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
-      usernameoremail: '',
+      username: '',
+      email: '',
       password: '',
     },
   });
 
-  // Handle login form submission
-  const handleLoginSubmit = async (data: LoginFormData) => {
+  // Handle signup form submission
+  const handleSignupSubmit = async (data: SignupFormData) => {
     try {
-      loginForm.clearErrors();
+      signupForm.clearErrors();
 
-      const response = await login({
-        usernameoremail: data.usernameoremail,
+      await register({
+        username: data.username,
+        email: data.email,
         password: data.password,
       });
 
-      const { id, username, email, avatar, role, access_token, refresh_token } =
-        response.data;
-
-      // Create user object for auth store
-      const authUser = {
-        id,
-        username,
-        email,
-        avatar:
-          avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
-        role,
-        access_token,
-        refresh_token,
-      };
-      setUser(authUser);
-
-      toast.success('Login successful!');
-      navigate({ to: '/chat' });
-    } catch (error) {
-      console.error('Login error:', error);
+      toast.success('Account created successfully!');
+      navigate({ to: '/login' });
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      signupForm.setError('root', {
+        message:
+          error.response?.data?.message ||
+          'Registration failed. Please try again.',
+      });
+      // Other errors are handled by useAxios interceptor (toast notifications)
     }
   };
 
-  // const handleGoogleLogin = () => {
-  //   // Mock Google login - replace with real Google OAuth when integrating backend
+  // const handleGoogleRegister = () => {
+  //   // Mock Google register - replace with real Google OAuth when integrating backend
   //   const mockGoogleUser = {
   //     id: 'google_' + Date.now(),
   //     name: 'Google User',
@@ -91,9 +82,9 @@ export const LoginPage = () => {
               <MessageCircle className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold">Join ChatApp</CardTitle>
           <CardDescription>
-            Sign in to continue your conversations
+            Create your account to start chatting
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -109,25 +100,26 @@ export const LoginPage = () => {
             </span>
           </div>
 
-          {/* Login Form */}
-          <Form {...loginForm}>
+          {/* Signup Form */}
+          <Form {...signupForm}>
             <form
-              onSubmit={loginForm.handleSubmit(handleLoginSubmit)}
+              onSubmit={signupForm.handleSubmit(handleSignupSubmit)}
               className="space-y-4"
             >
               <FormField
-                control={loginForm.control}
-                name="usernameoremail"
+                control={signupForm.control}
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                         <Input
-                          type="email"
-                          placeholder="Enter your email"
+                          type="text"
+                          placeholder="Enter your username"
                           className="pl-10"
+                          autoComplete="off"
                           {...field}
                         />
                       </div>
@@ -138,7 +130,30 @@ export const LoginPage = () => {
               />
 
               <FormField
-                control={loginForm.control}
+                control={signupForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input
+                          type="text"
+                          placeholder="Enter your email"
+                          className="pl-10"
+                          autoComplete="off"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={signupForm.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
@@ -160,28 +175,27 @@ export const LoginPage = () => {
               />
 
               {/* Display form-level errors */}
-              {loginForm.formState.errors.root && (
+              {signupForm.formState.errors.root && (
                 <div className="text-sm text-destructive text-center">
-                  {loginForm.formState.errors.root.message}
+                  {signupForm.formState.errors.root.message}
                 </div>
               )}
 
               <Button
                 type="submit"
                 className="w-full bg-gradient-primary hover:opacity-75"
-                disabled={loginForm.formState.isSubmitting}
+                disabled={signupForm.formState.isSubmitting}
               >
-                {loginForm.formState.isSubmitting ? 'Signing In...' : 'Sign In'}
+                {signupForm.formState.isSubmitting
+                  ? 'Creating Account...'
+                  : 'Create Account'}
               </Button>
             </form>
           </Form>
 
           <div className="text-center">
-            <Link
-              to="/register"
-              className="text-sm text-primary hover:underline"
-            >
-              Don't have an account? Sign up
+            <Link to="/login" className="text-sm text-primary hover:underline">
+              Already have an account? Sign in
             </Link>
           </div>
         </CardContent>

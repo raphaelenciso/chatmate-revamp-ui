@@ -1,16 +1,29 @@
 import type { IUserContact } from '../types/IUserContact';
 
+// Base contact template with required IUser fields
+const createContact = (
+  contact: Omit<IUserContact, 'role' | 'access_token' | 'refresh_token'>
+): IUserContact => ({
+  ...contact,
+  role: 'user',
+  access_token: '',
+  refresh_token: '',
+});
+
 export const mockContacts: IUserContact[] = [
   {
     id: 'ai-assistant',
     email: 'ai@assistant.com',
     name: 'AI Assistant',
     avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=ai',
+    role: 'ai',
+    access_token: '',
+    refresh_token: '',
     status: 'online',
     lastMessage: "I'm here to help you!",
     isAI: true,
   },
-  {
+  createContact({
     id: 'contact1',
     email: 'alice@example.com',
     name: 'Alice Johnson',
@@ -19,8 +32,8 @@ export const mockContacts: IUserContact[] = [
     lastMessage: 'Hey! How are you doing?',
     unreadCount: 2,
     lastSeen: '2 min ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact2',
     email: 'bob@example.com',
     name: 'Bob Smith',
@@ -28,8 +41,8 @@ export const mockContacts: IUserContact[] = [
     status: 'away',
     lastMessage: "Let's catch up later!",
     lastSeen: '1 hour ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact3',
     email: 'carol@example.com',
     name: 'Carol Davis',
@@ -37,8 +50,8 @@ export const mockContacts: IUserContact[] = [
     status: 'busy',
     lastMessage: 'In a meeting, will call back',
     lastSeen: '30 min ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact4',
     email: 'david@example.com',
     name: 'David Wilson',
@@ -46,8 +59,8 @@ export const mockContacts: IUserContact[] = [
     status: 'offline',
     lastMessage: 'Thanks for the help!',
     lastSeen: 'yesterday',
-  },
-  {
+  }),
+  createContact({
     id: 'contact5',
     email: 'emma@example.com',
     name: 'Emma Thompson',
@@ -56,8 +69,8 @@ export const mockContacts: IUserContact[] = [
     lastMessage: 'Just finished the project!',
     unreadCount: 1,
     lastSeen: '5 min ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact6',
     email: 'frank@example.com',
     name: 'Frank Martinez',
@@ -65,8 +78,8 @@ export const mockContacts: IUserContact[] = [
     status: 'away',
     lastMessage: 'Coffee break, back in 15',
     lastSeen: '15 min ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact7',
     email: 'grace@example.com',
     name: 'Grace Lee',
@@ -75,8 +88,8 @@ export const mockContacts: IUserContact[] = [
     lastMessage: 'Great work on the presentation!',
     unreadCount: 3,
     lastSeen: 'just now',
-  },
-  {
+  }),
+  createContact({
     id: 'contact8',
     email: 'henry@example.com',
     name: 'Henry Brown',
@@ -84,8 +97,8 @@ export const mockContacts: IUserContact[] = [
     status: 'busy',
     lastMessage: 'Can we reschedule our call?',
     lastSeen: '2 hours ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact9',
     email: 'isabella@example.com',
     name: 'Isabella Garcia',
@@ -93,8 +106,8 @@ export const mockContacts: IUserContact[] = [
     status: 'offline',
     lastMessage: 'Have a great weekend!',
     lastSeen: '2 days ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact10',
     email: 'jack@example.com',
     name: 'Jack Chen',
@@ -103,8 +116,8 @@ export const mockContacts: IUserContact[] = [
     lastMessage: 'The new feature looks amazing!',
     unreadCount: 2,
     lastSeen: '3 min ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact11',
     email: 'kate@example.com',
     name: 'Kate Williams',
@@ -112,8 +125,8 @@ export const mockContacts: IUserContact[] = [
     status: 'away',
     lastMessage: 'Running late, be there soon',
     lastSeen: '20 min ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact12',
     email: 'liam@example.com',
     name: 'Liam Rodriguez',
@@ -121,8 +134,8 @@ export const mockContacts: IUserContact[] = [
     status: 'busy',
     lastMessage: 'Deep focus mode until 5 PM',
     lastSeen: '1 hour ago',
-  },
-  {
+  }),
+  createContact({
     id: 'contact13',
     email: 'maya@example.com',
     name: 'Maya Patel',
@@ -131,8 +144,8 @@ export const mockContacts: IUserContact[] = [
     lastMessage: 'Thanks for the code review!',
     unreadCount: 4,
     lastSeen: 'just now',
-  },
-  {
+  }),
+  createContact({
     id: 'contact14',
     email: 'noah@example.com',
     name: 'Noah Anderson',
@@ -140,5 +153,5 @@ export const mockContacts: IUserContact[] = [
     status: 'offline',
     lastMessage: 'See you at the team meeting',
     lastSeen: '3 days ago',
-  },
+  }),
 ];
