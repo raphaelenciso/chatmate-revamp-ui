@@ -1,12 +1,12 @@
 import type { IUserContact } from '../types/IUserContact';
+import { generateUserAvatarUrl } from '@/utils/avatarUtils';
 
 export const mockContacts: IUserContact[] = [
   {
     id: 'ai-assistant',
     username: 'AI Assistant',
     email: 'ai@assistant.com',
-    avatar:
-      'https://api.dicebear.com/7.x/bottts/svg?seed=ai&backgroundColor=e28743',
+    avatar: generateUserAvatarUrl('ai-assistant', 'bottts'),
     // lastMessage: "I'm here to help you!",
     // isAI: true,
   },
@@ -14,14 +14,12 @@ export const mockContacts: IUserContact[] = [
     id: 'contact1',
     username: 'Alice Johnson',
     email: 'alice@example.com',
-    avatar:
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Valentina&backgroundColor=b6e3f4',
+    avatar: generateUserAvatarUrl('alice@example.com', 'lorelei'),
   },
   {
     id: 'contact2',
     username: 'Bob Smith',
     email: 'bob@example.com',
-    avatar:
-      'https://api.dicebear.com/7.x/avataaars/svg?seed=Mason&backgroundColor=c0aede',
+    avatar: generateUserAvatarUrl('bob@example.com', 'lorelei'),
   },
 ];
