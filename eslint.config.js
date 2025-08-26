@@ -114,6 +114,7 @@ export default tseslint.config([
       'unicorn/throw-new-error': 'error',
       'unicorn/prefer-number-properties': 'off',
       'unicorn/no-negated-condition': 'off',
+      '@typescript-eslint/array-type': 'off',
       'react-refresh/only-export-components': 'off',
     },
   },

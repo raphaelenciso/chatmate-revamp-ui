@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Plus, Sun, Moon } from 'lucide-react';
 import { getInitials } from '../../utils/stringHelpers';
-import Contact from './Contact';
+
 import { cn } from '@/lib/utils';
-import type { IUserContact } from '../../types/IUserContact';
+
 import { useAuthStore } from '@/stores/authStore';
 import useThemeStore from '@/stores/themeStore';
 import {
@@ -15,20 +15,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Conversation from './Conversation';
+import type { IConversation } from '../../types/IConversation';
 
 interface ChatSidebarProps {
-  userContacts: IUserContact[];
-  activeContactId?: string;
-  onContactSelect: (userContact: IUserContact) => void;
+  userConversations: IConversation[] | null;
+  activeConversationId?: string;
+  onConversationSelect: (conversation: IConversation) => void;
   setIsNewChatDialogOpen: (isOpen: boolean) => void;
 
   className?: string;
 }
 
 export const ChatSidebar = ({
-  userContacts,
-  activeContactId,
-  onContactSelect,
+  userConversations,
+  activeConversationId,
+  onConversationSelect,
   setIsNewChatDialogOpen,
 
   className,
@@ -124,12 +126,12 @@ export const ChatSidebar = ({
 
       {/* Contacts List */}
       <div className="w-full  h-full overflow-y-auto px-2">
-        {userContacts.map((userContact) => (
-          <Contact
-            key={userContact.id}
-            userContact={userContact}
-            isActive={activeContactId === userContact.id}
-            onSelect={onContactSelect}
+        {userConversations?.map((conversation) => (
+          <Conversation
+            key={conversation.id}
+            conversation={conversation}
+            isActive={activeConversationId === conversation.id}
+            onSelect={onConversationSelect}
           />
         ))}
       </div>

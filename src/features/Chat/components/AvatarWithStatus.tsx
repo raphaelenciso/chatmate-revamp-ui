@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 interface AvatarWithStatusProps {
   avatar: string;
   name: string;
-  status?: string;
+  isOnline?: boolean;
   isAI?: boolean;
   className?: string;
 }
@@ -14,28 +14,10 @@ interface AvatarWithStatusProps {
 const AvatarWithStatus = ({
   avatar,
   name,
-  status,
+  isOnline,
   isAI,
   className,
 }: AvatarWithStatusProps) => {
-  // Helper function to get status indicator color
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'online': {
-        return 'bg-gradient-to-br from-green-400 to-green-600';
-      }
-      case 'away': {
-        return 'bg-gradient-to-br from-yellow-400 to-yellow-600';
-      }
-      case 'busy': {
-        return 'bg-gradient-to-br from-red-400 to-red-600';
-      }
-      default: {
-        return 'bg-gradient-to-br from-gray-400 to-gray-600';
-      }
-    }
-  };
-
   return (
     <div className="relative">
       <Avatar className={cn('h-12 w-12', className)}>
@@ -47,11 +29,9 @@ const AvatarWithStatus = ({
           <Bot className="h-3 w-3 text-accent-foreground" />
         </div>
       ) : (
-        status && (
-          <div
-            className={`absolute -bottom-1 -right-1 size-3 ${getStatusColor(status)} rounded-full`}
-          ></div>
-        )
+        <div
+          className={`absolute bottom-0 right-0 size-3 ${isOnline ? 'bg-green-500' : 'bg-red-500'} rounded-full`}
+        />
       )}
     </div>
   );

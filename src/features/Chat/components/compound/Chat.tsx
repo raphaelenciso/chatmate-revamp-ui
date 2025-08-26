@@ -9,11 +9,11 @@ import { ChatMessages } from './ChatMessages';
 
 import type { IMessage } from '../../types/IMessage';
 import { cn } from '@/lib/utils';
-import type { IUserContact } from '../../types/IUserContact';
+import type { IConversation } from '../../types/IConversation';
 
 interface ChatProps {
   children: ReactNode;
-  userContact?: IUserContact;
+  conversation?: IConversation;
   messages: IMessage[];
   currentUserId: string;
   isTyping?: boolean;
@@ -36,7 +36,7 @@ interface ChatCompoundComponent {
  */
 const ChatRoot = ({
   children,
-  userContact,
+  conversation,
   messages,
   currentUserId,
   isTyping = false,
@@ -44,7 +44,7 @@ const ChatRoot = ({
   className,
 }: ChatProps) => {
   // Show welcome screen if no contact is selected
-  if (!userContact) {
+  if (!conversation) {
     return (
       <div
         className={cn(
@@ -67,7 +67,7 @@ const ChatRoot = ({
 
   return (
     <ChatProvider
-      userContact={userContact}
+      conversation={conversation}
       messages={messages}
       currentUserId={currentUserId}
       isTyping={isTyping}

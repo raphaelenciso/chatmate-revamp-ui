@@ -1,10 +1,10 @@
 import { ChevronLeft } from 'lucide-react';
 import { useChatContext } from './ChatContext';
-import type { IUserContact } from '../../types/IUserContact';
 import AvatarWithStatus from '../AvatarWithStatus';
+import type { IConversation } from '../../types/IConversation';
 
 interface ChatHeaderProps {
-  userContact?: IUserContact;
+  conversation?: IConversation;
   showCallButtons?: boolean;
   onBackClick?: () => void;
 }
@@ -14,15 +14,15 @@ interface ChatHeaderProps {
  * Shows userContact avatar, name, status and optional action buttons
  */
 export const ChatHeader = ({
-  userContact: propContact,
+  conversation: propConversation,
 
   onBackClick,
 }: ChatHeaderProps) => {
   // Use context userContact if no prop userContact is provided (compound component usage)
-  const contextContact = useChatContext()?.userContact;
-  const userContact = propContact || contextContact;
+  const contextConversation = useChatContext()?.conversation;
+  const conversation = propConversation || contextConversation;
 
-  if (!userContact) {
+  if (!conversation) {
     return null;
   }
   return (
@@ -34,12 +34,14 @@ export const ChatHeader = ({
         />
 
         <AvatarWithStatus
-          avatar={userContact.avatar}
-          name={userContact.username}
+          avatar={conversation.participants[0].avatar}
+          name={conversation.participants[0].username}
           className="h-9 w-9"
         />
         <div>
-          <h2 className="font-semibold text-sm">{userContact.username}</h2>
+          <h2 className="font-semibold text-sm">
+            {conversation.participants[0].username}
+          </h2>
         </div>
       </div>
     </div>

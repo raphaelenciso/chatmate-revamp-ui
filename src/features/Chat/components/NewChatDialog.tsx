@@ -13,12 +13,12 @@ import { Search, Loader2 } from 'lucide-react';
 import { useUsersApi } from '../api/usersApi';
 import { getInitials } from '../utils/stringHelpers';
 import type { IUser } from '@/types/IUser';
-import type { IUserContact } from '../types/IUserContact';
+import type { IConversation } from '../types/IConversation';
 
 interface NewChatDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onUserSelect: (user: IUserContact) => void;
+  onUserSelect: (user: IConversation) => void;
 }
 
 export const NewChatDialog = ({
@@ -59,7 +59,13 @@ export const NewChatDialog = ({
   }, [searchQuery]);
 
   const handleUserSelect = (user: IUser) => {
-    onUserSelect(user);
+    onUserSelect({
+      id: user.id,
+      username: user.username,
+      avatar: user.avatar,
+      isOnline: false,
+      lastSeen: new Date(),
+    });
     setIsOpen(false);
     setSearchQuery('');
     setUsers([]);

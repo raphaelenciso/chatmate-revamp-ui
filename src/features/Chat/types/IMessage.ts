@@ -3,9 +3,18 @@ export type ContentType = 'text' | 'image';
 
 export interface IMessage {
   id: string;
-  senderId: string;
-  role: RoleType;
-  contentType: ContentType;
+  conversation: string | null;
+  sender: RoleType;
   content: string;
   timestamp: string;
+  readBy: {
+    user: string;
+    readAt: string;
+  }[];
+}
+
+export interface IPostMessagePayload {
+  conversation: string;
+  sender: string;
+  content: string;
 }

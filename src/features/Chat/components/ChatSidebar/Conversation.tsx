@@ -1,17 +1,21 @@
-import type { IUserContact } from '../../types/IUserContact';
 import { cn } from '@/lib/utils';
 import AvatarWithStatus from '../AvatarWithStatus';
+import type { IConversation } from '../../types/IConversation';
 
-interface ContactProps {
-  userContact: IUserContact;
-  onSelect: (userContact: IUserContact) => void;
+interface ConversationProps {
+  conversation: IConversation;
+  onSelect: (conversation: IConversation) => void;
   isActive: boolean;
 }
 
-const Contact = ({ userContact, isActive, onSelect }: ContactProps) => {
+const Conversation = ({
+  conversation,
+  isActive,
+  onSelect,
+}: ConversationProps) => {
   return (
     <div
-      onClick={() => onSelect(userContact)}
+      onClick={() => onSelect(conversation)}
       className={cn(
         'w-full  flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-colors ',
         isActive ? 'bg-primary/8' : 'hover:bg-muted'
@@ -19,8 +23,9 @@ const Contact = ({ userContact, isActive, onSelect }: ContactProps) => {
     >
       <div className="relative">
         <AvatarWithStatus
-          avatar={userContact.avatar}
-          name={userContact.username}
+          avatar={conversation.participants[0].avatar}
+          name={conversation.participants[0].username}
+          isOnline={conversation.participants[0].isOnline}
         />
       </div>
 
@@ -28,7 +33,7 @@ const Contact = ({ userContact, isActive, onSelect }: ContactProps) => {
         <div className="w-full  ">
           <div className="flex items-center justify-between">
             <h3 className="font-medium text-sm truncate">
-              {userContact.username}
+              {conversation.participants[0].username}
             </h3>
           </div>
           <p
@@ -37,8 +42,8 @@ const Contact = ({ userContact, isActive, onSelect }: ContactProps) => {
               // !!userContact.unreadCount && 'font-bold'
             )}
           >
-            {/* {userContact.lastMessage ||
-              `${userContact.status === 'online' ? 'Online' : `Last seen ${userContact.lastSeen}`}`} */}
+            {conversation.lastMessage.content ||
+              `${conversation.participants[0].isOnline ? 'Online' : `Last seen ${conversation.participants[0].lastSeen}`}`}
           </p>
         </div>
 
@@ -50,4 +55,4 @@ const Contact = ({ userContact, isActive, onSelect }: ContactProps) => {
   );
 };
 
-export default Contact;
+export default Conversation;

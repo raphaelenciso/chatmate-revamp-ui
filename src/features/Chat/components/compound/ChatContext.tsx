@@ -1,9 +1,10 @@
 import { createContext, useContext, type ReactNode } from 'react';
-import type { IUserContact } from '../../types/IUserContact';
+
 import type { IMessage } from '../../types/IMessage';
+import type { IConversation } from '../../types/IConversation';
 
 interface ChatContextValue {
-  userContact?: IUserContact;
+  conversation?: IConversation;
   messages: IMessage[];
   currentUserId: string;
   isTyping: boolean;
@@ -14,7 +15,7 @@ const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 interface ChatProviderProps {
   children: ReactNode;
-  userContact?: IUserContact;
+  conversation?: IConversation;
   messages: IMessage[];
   currentUserId: string;
   isTyping: boolean;
@@ -27,7 +28,7 @@ interface ChatProviderProps {
  */
 export const ChatProvider = ({
   children,
-  userContact,
+  conversation,
   messages,
   currentUserId,
   isTyping,
@@ -36,7 +37,7 @@ export const ChatProvider = ({
   return (
     <ChatContext.Provider
       value={{
-        userContact,
+        conversation,
         messages,
         currentUserId,
         isTyping,
