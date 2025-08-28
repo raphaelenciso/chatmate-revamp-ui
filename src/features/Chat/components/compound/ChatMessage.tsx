@@ -1,11 +1,11 @@
 import { formatTime } from '../../utils/dateHelpers';
 import type { IMessage } from '../../types/IMessage';
-import type { IUserContact } from '../../types/IUserContact';
+import type { IUser } from '@/types/IUser';
 
 interface ChatMessageProps {
   message: IMessage;
-  isOwn: boolean;
-  userContact?: IUserContact;
+
+  userContact: IUser;
   currentUserId: string;
 }
 
@@ -13,15 +13,13 @@ interface ChatMessageProps {
  * Reusable ChatMessage component for displaying individual chat messages
  * Handles different message types and styling based on sender
  */
-export const ChatMessage = ({
-  message,
-  isOwn,
-  userContact,
-}: ChatMessageProps) => {
+export const ChatMessage = ({ message, userContact }: ChatMessageProps) => {
   const isAI =
-    message.role === 'bot' ||
-    (message.senderId === userContact?.id &&
+    message.sender.id === 'bot' ||
+    (message.sender.id === userContact?.id &&
       userContact?.id === 'ai-assistant');
+
+  const isOwn = message.sender.id === userContact.id;
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>

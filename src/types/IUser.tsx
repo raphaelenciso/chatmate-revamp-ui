@@ -4,6 +4,6 @@ export interface IUser {
   email: string;
   avatar: string;
   role: string;
-  accessToken: string;
-  refreshToken: string;
+  accessToken?: string;
+  refreshToken?: string;
 }

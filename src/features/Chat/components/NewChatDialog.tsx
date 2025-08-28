@@ -18,7 +18,7 @@ import type { IConversation } from '../types/IConversation';
 interface NewChatDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  onUserSelect: (user: IConversation) => void;
+  onUserSelect: (conversation: IConversation) => void;
 }
 
 export const NewChatDialog = ({
@@ -61,10 +61,20 @@ export const NewChatDialog = ({
   const handleUserSelect = (user: IUser) => {
     onUserSelect({
       id: user.id,
-      username: user.username,
-      avatar: user.avatar,
-      isOnline: false,
-      lastSeen: new Date(),
+      participants: [
+        {
+          id: user.id,
+          avatar: user.avatar,
+          username: user.username,
+          isOnline: false,
+          lastSeen: new Date(),
+        },
+      ],
+      lastMessage: {
+        content: '',
+        readyBy: [],
+        sender: user,
+      },
     });
     setIsOpen(false);
     setSearchQuery('');

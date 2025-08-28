@@ -28,7 +28,7 @@ export const MessageInput = ({
 }: MessageInputProps) => {
   // Get context values for compound component usage
   const context = useChatContext();
-  const contextContact = context?.userContact;
+  const contextContact = context?.conversation?.participants[0];
   const contextOnSend = context?.onSendMessage;
 
   // Internal state for compound component usage

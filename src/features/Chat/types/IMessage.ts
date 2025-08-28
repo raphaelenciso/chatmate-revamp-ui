@@ -1,14 +1,17 @@
+import type { IUser } from '@/types/IUser';
+import type { IConversation } from './IConversation';
+
 export type RoleType = 'user' | 'bot';
 export type ContentType = 'text' | 'image';
 
 export interface IMessage {
   id: string;
-  conversation: string | null;
-  sender: RoleType;
+  conversation: IConversation;
+  sender: IUser;
   content: string;
   timestamp: string;
   readBy: {
-    user: string;
+    user: IUser;
     readAt: string;
   }[];
 }
