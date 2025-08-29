@@ -1,4 +1,5 @@
 import type { IResponse } from '@/types/IResponse';
+import type { IUser } from '@/types/IUser';
 
 export interface ILoginPayload {
   usernameoremail: string;
@@ -14,15 +15,7 @@ export interface IRegisterPayload {
 
 // API Response types
 export interface IAuthResponse extends IResponse {
-  data: {
-    id: string;
-    username: string;
-    email: string;
-    avatar: string;
-    role: string;
-    accessToken: string;
-    refreshToken: string;
-  };
+  data: IUser;
 }
 
 export interface IApiError {

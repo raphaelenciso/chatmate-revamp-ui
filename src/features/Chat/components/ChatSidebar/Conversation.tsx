@@ -42,7 +42,7 @@ const Conversation = ({
               // !!userContact.unreadCount && 'font-bold'
             )}
           >
-            {conversation.lastMessage.content ||
+            {conversation.lastMessage?.content ||
               `${conversation.participants[0].isOnline ? 'Online' : `Last seen ${conversation.participants[0].lastSeen}`}`}
           </p>
         </div>

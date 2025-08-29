@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
 import {
   Card,
   CardContent,
@@ -17,7 +16,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
 import { Mail, Lock } from 'lucide-react';
@@ -52,16 +50,29 @@ export const LoginPage = () => {
         password: data.password,
       });
 
-      const { id, username, email, avatar, role, accessToken, refreshToken } =
-        response.data;
-
-      // Create user object for auth store
-      const authUser = {
+      const {
         id,
         username,
         email,
         avatar,
         role,
+        accessToken,
+        refreshToken,
+        isActive,
+        lastSeen,
+        isOnline,
+      } = response.data;
+
+      // Create user object for auth store
+      const authUser = {
+        id,
+        avatar,
+        username,
+        email,
+        role,
+        isActive,
+        lastSeen,
+        isOnline,
         accessToken,
         refreshToken,
       };
@@ -125,7 +136,6 @@ export const LoginPage = () => {
                         />
                       </div>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -139,14 +149,16 @@ export const LoginPage = () => {
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
-                        <PasswordInput
+                        <Input
                           placeholder="Enter your password"
                           className="pl-10"
                           {...field}
                         />
+                        {/* <PasswordInput
+                        
+                        /> */}
                       </div>
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />

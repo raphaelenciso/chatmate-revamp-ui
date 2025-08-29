@@ -37,7 +37,7 @@ export const useSocket = () => {
 
     // Handle successful connection
     newSocket.on('connect', () => {
-      console.log('Socket connected');
+      toast.success('Websocket connected');
       setSocket(newSocket);
     });
 
@@ -45,7 +45,9 @@ export const useSocket = () => {
     newSocket.on('connect_error', (error) => {
       console.error('Socket connection error:', error.message);
       toast.error('Connection Error: ' + error.message);
-      setUser(null);
+      if (error.message === 'invalid access token') {
+        setUser(null);
+      }
     });
 
     // Handle token refresh events
@@ -55,15 +57,12 @@ export const useSocket = () => {
 
     newSocket.on('user-online', (userId: string) => {
       console.log('User online:', userId);
-      console.log(userConversations);
 
       const conversationsOnline = userConversations?.filter((conversation) =>
         conversation.participants.some(
           (participant) => participant.id === userId
         )
       );
-
-      console.log({ conversationsOnline });
 
       if (!conversationsOnline?.length) return;
 
@@ -81,15 +80,13 @@ export const useSocket = () => {
 
     newSocket.on('user-offline', (userId: string) => {
       console.log('User offline:', userId);
-      console.log(userConversations);
+      // console.log(userConversations);
 
       const conversationsOnline = userConversations?.filter((conversation) =>
         conversation.participants.some(
           (participant) => participant.id === userId
         )
       );
-
-      console.log({ conversationsOnline });
 
       if (!conversationsOnline?.length) return;
 
@@ -107,7 +104,6 @@ export const useSocket = () => {
 
     // Cleanup function - disconnect socket and clear from store
     return () => {
-      console.log('Cleaning up socket');
       newSocket.disconnect();
       setSocket(null);
     };

@@ -6,7 +6,6 @@ import { ChatWindow } from '../components/ChatWindow';
 import type { IMessage } from '../types/IMessage';
 
 import { useAuthStore } from '@/stores/authStore';
-import { mockMessages } from '../constants/messages';
 import { cn } from '@/lib/utils';
 import { NewChatDialog } from '../components/NewChatDialog';
 import { useSocket } from '../hooks/useSocket';
@@ -20,16 +19,14 @@ export const ChatPage = () => {
   const [activeConversation, setActiveConversation] = useState<
     IConversation | undefined
   >();
-  const [messages, setMessages] = useState<{ [contactId: string]: IMessage[] }>(
-    mockMessages
-  );
+  const [messages, setMessages] = useState<IMessage[]>([]);
   const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false);
 
   const { postConversation, getConversations } = useConversationsApi();
   const { postMessage } = useMessagesApi();
 
   const { socket } = useSocket();
-  const user = useAuthStore((state) => state.user);
+  const currentUser = useAuthStore((state) => state.user);
   const userConversations = useConversationsStore(
     (state) => state.userConversations
   );
@@ -49,40 +46,50 @@ export const ChatPage = () => {
     // }
   };
 
-  const handleOnConversationSelect = (conversation: IConversation) => {
+  const handleOnConversationSelect = async (conversation: IConversation) => {
     // Check if contact already exists
-    const existingContact = userConversations?.find(
-      (c) => c.id === conversation.id
-    );
+    // TODO: userconversation should paginated and this should be check on all users conversations
+    let existingContact: IConversation | undefined;
+
+    // Ensure userConversations is always an array
+    const currentConversations = userConversations || [];
+
+    if (currentConversations.length > 0) {
+      existingContact = currentConversations.find(
+        (c) => c.id === conversation.id
+      );
+    }
 
     if (existingContact) {
       // If contact exists, just select it
       setActiveConversation(existingContact);
+      // const messages = await getMessages(existingContact.id);
+      // setMessages(messages.data as IMessage[]);
     } else {
       // Temporary add to the conversations list
-      setUserConversations([conversation, ...(userConversations || [])]);
+      setUserConversations([conversation, ...currentConversations]);
       setActiveConversation(conversation);
-
-      // // Initialize empty messages for this contact
-      setMessages((prev) => ({
-        ...prev,
-        [conversation.id]: [],
-      }));
+      setMessages([]);
     }
   };
 
   const handleSendMessage = async (content: string) => {
-    if (!user || !activeConversation) return;
+    if (!currentUser || !activeConversation) return;
 
-    if (!activeConversation.id) {
-      await postConversation({
-        participants: [user?.id, activeConversation.id],
+    if (activeConversation.id.includes('temporary')) {
+      const response = await postConversation({
+        participants: [activeConversation.participants[0].id, currentUser?.id],
+        lastMessage: {
+          content,
+          sender: currentUser.id,
+        },
       });
+      setActiveConversation(response.data);
     }
 
     await postMessage({
       conversation: activeConversation.id,
-      sender: user.id,
+      sender: currentUser.id,
       content,
     });
 
@@ -113,9 +120,16 @@ export const ChatPage = () => {
 
   useEffect(() => {
     const fetchConversations = async () => {
-      const conversations = await getConversations();
-      // console.log(conversations[0].participants[0]);
-      setUserConversations(conversations);
+      try {
+        const response = await getConversations();
+        // Ensure we're setting an array
+        const conversations = response?.data || [];
+
+        setUserConversations(conversations);
+      } catch (error) {
+        console.error('Error fetching conversations:', error);
+        setUserConversations([]);
+      }
     };
 
     if (!socket) return;
@@ -128,7 +142,7 @@ export const ChatPage = () => {
   return (
     <div className="h-screen max-h-screen flex gap-2 bg-muted p-3 overflow-hidden ">
       <ChatSidebar
-        userConversations={userConversations}
+        userConversations={userConversations || []}
         activeConversationId={activeConversation?.id}
         onConversationSelect={handleConversationSelect}
         setIsNewChatDialogOpen={setIsNewChatDialogOpen}
@@ -140,8 +154,8 @@ export const ChatPage = () => {
 
       <ChatWindow
         conversation={activeConversation}
-        messages={messages[activeConversation?.id || ''] || []}
-        currentUserId={user?.id || ''}
+        messages={messages}
+        currentUserId={currentUser?.id || ''}
         onSendMessage={handleSendMessage}
         onBackClick={() => setActiveConversation(undefined)}
         className={cn(

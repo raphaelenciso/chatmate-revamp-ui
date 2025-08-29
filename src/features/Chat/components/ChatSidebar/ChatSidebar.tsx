@@ -48,7 +48,7 @@ export const ChatSidebar = ({
   //       username: searchQuery,
   //       excludeSelf: true,
   //     });
-  //     console.log(users);
+
   //   };
   //   fetchUsers();
   // }, [searchQuery, getUsers]);
@@ -125,16 +125,18 @@ export const ChatSidebar = ({
       </div>
 
       {/* Contacts List */}
-      <div className="w-full  h-full overflow-y-auto px-2">
-        {userConversations?.map((conversation) => (
-          <Conversation
-            key={conversation.id}
-            conversation={conversation}
-            isActive={activeConversationId === conversation.id}
-            onSelect={onConversationSelect}
-          />
-        ))}
-      </div>
+      {userConversations && userConversations.length > 0 && (
+        <div className="w-full  h-full overflow-y-auto px-2">
+          {userConversations?.map((conversation) => (
+            <Conversation
+              key={conversation.id}
+              conversation={conversation}
+              isActive={activeConversationId === conversation.id}
+              onSelect={onConversationSelect}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

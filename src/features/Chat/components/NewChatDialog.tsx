@@ -14,6 +14,8 @@ import { useUsersApi } from '../api/usersApi';
 import { getInitials } from '../utils/stringHelpers';
 import type { IUser } from '@/types/IUser';
 import type { IConversation } from '../types/IConversation';
+import { useConversationsApi } from '../api/conversationsApi';
+import { useAuthStore } from '@/stores/authStore';
 
 interface NewChatDialogProps {
   isOpen: boolean;
@@ -27,6 +29,8 @@ export const NewChatDialog = ({
   onUserSelect,
 }: NewChatDialogProps) => {
   const { getUsers } = useUsersApi();
+  const currentUser = useAuthStore((state) => state.user);
+  const { getConversations } = useConversationsApi();
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(false);
@@ -45,7 +49,7 @@ export const NewChatDialog = ({
           username: searchQuery,
           excludeSelf: true,
         });
-        console.log(response);
+
         setUsers(response.data.users || []);
       } catch (error) {
         console.error('Error searching users:', error);
@@ -58,24 +62,23 @@ export const NewChatDialog = ({
     searchUsers();
   }, [searchQuery]);
 
-  const handleUserSelect = (user: IUser) => {
-    onUserSelect({
-      id: user.id,
-      participants: [
-        {
-          id: user.id,
-          avatar: user.avatar,
-          username: user.username,
-          isOnline: false,
-          lastSeen: new Date(),
-        },
-      ],
-      lastMessage: {
-        content: '',
-        readyBy: [],
-        sender: user,
-      },
+  const handleUserSelect = async (user: IUser) => {
+    if (!currentUser) return;
+
+    const conversation = await getConversations({
+      participantsIds: [user.id],
     });
+
+    // Create temporary conversation if it doesn't exist
+    if (conversation.data.length === 0) {
+      onUserSelect({
+        id: 'temporary-conversation',
+        participants: [user],
+      });
+    } else {
+      onUserSelect(conversation.data[0]);
+    }
+
     setIsOpen(false);
     setSearchQuery('');
     setUsers([]);

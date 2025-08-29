@@ -1,9 +1,12 @@
 export interface IUser {
   id: string;
+  avatar: string;
   username: string;
   email: string;
-  avatar: string;
-  role: string;
+  role: 'user' | 'admin';
+  isActive: boolean;
+  lastSeen: string;
+  isOnline: boolean;
   accessToken?: string;
   refreshToken?: string;
 }
