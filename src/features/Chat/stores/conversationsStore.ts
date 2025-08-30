@@ -3,9 +3,18 @@ import type { IConversation } from '../types/IConversation';
 
 export const useConversationsStore = create<{
   userConversations: IConversation[];
-  setUserConversations: (userConversations: IConversation[]) => void;
+  setUserConversations: (
+    userConversations:
+      | IConversation[]
+      | ((prev: IConversation[]) => IConversation[])
+  ) => void;
 }>((set) => ({
   userConversations: [],
   setUserConversations: (userConversations) =>
-    set({ userConversations: userConversations || [] }),
+    set((state) => ({
+      userConversations:
+        typeof userConversations === 'function'
+          ? userConversations(state.userConversations)
+          : userConversations || [],
+    })),
 }));

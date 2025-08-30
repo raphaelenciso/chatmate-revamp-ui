@@ -6,6 +6,7 @@ import { API_URL } from '@/lib/config';
 import { useSocketStore } from '@/stores/socketStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useConversationsStore } from '../stores/conversationsStore';
+import type { IConversation } from '../types/IConversation';
 
 /**
  * Custom hook to manage socket connection lifecycle
@@ -16,9 +17,6 @@ export const useSocket = () => {
   const setSocket = useSocketStore((state) => state.setSocket);
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
-  const userConversations = useConversationsStore(
-    (state) => state.userConversations
-  );
   const setUserConversations = useConversationsStore(
     (state) => state.setUserConversations
   );
@@ -58,48 +56,95 @@ export const useSocket = () => {
     newSocket.on('user-online', (userId: string) => {
       console.log('User online:', userId);
 
-      const conversationsOnline = userConversations?.filter((conversation) =>
-        conversation.participants.some(
-          (participant) => participant.id === userId
-        )
-      );
+      // Use callback function to get current state
+      setUserConversations((currentConversations: IConversation[]) => {
+        console.log(
+          'Current conversations when user comes online:',
+          currentConversations
+        );
 
-      if (!conversationsOnline?.length) return;
+        const conversationsToUpdate = currentConversations?.filter(
+          (conversation: IConversation) =>
+            conversation.participants.some(
+              (participant) => participant.id === userId
+            )
+        );
 
-      setUserConversations(
-        conversationsOnline.map((conversation) => ({
-          ...conversation,
-          participants: conversation.participants.map((participant) =>
-            participant.id === userId
-              ? { ...participant, isOnline: true }
-              : participant
-          ),
-        }))
-      );
+        if (!conversationsToUpdate?.length) {
+          console.log('No conversations found for user:', userId);
+          return currentConversations;
+        }
+
+        console.log(
+          'Updating conversations for online user:',
+          userId,
+          conversationsToUpdate
+        );
+
+        return currentConversations.map((conversation: IConversation) => {
+          const hasParticipant = conversation.participants.some(
+            (participant) => participant.id === userId
+          );
+
+          if (!hasParticipant) return conversation;
+
+          return {
+            ...conversation,
+            participants: conversation.participants.map((participant) =>
+              participant.id === userId
+                ? { ...participant, isOnline: true }
+                : participant
+            ),
+          };
+        });
+      });
     });
 
     newSocket.on('user-offline', (userId: string) => {
       console.log('User offline:', userId);
-      // console.log(userConversations);
 
-      const conversationsOnline = userConversations?.filter((conversation) =>
-        conversation.participants.some(
-          (participant) => participant.id === userId
-        )
-      );
+      // Use callback function to get current state
+      setUserConversations((currentConversations: IConversation[]) => {
+        console.log(
+          'Current conversations when user goes offline:',
+          currentConversations
+        );
 
-      if (!conversationsOnline?.length) return;
+        const conversationsToUpdate = currentConversations?.filter(
+          (conversation: IConversation) =>
+            conversation.participants.some(
+              (participant) => participant.id === userId
+            )
+        );
 
-      setUserConversations(
-        conversationsOnline.map((conversation) => ({
-          ...conversation,
-          participants: conversation.participants.map((participant) =>
-            participant.id === userId
-              ? { ...participant, isOnline: false }
-              : participant
-          ),
-        }))
-      );
+        if (!conversationsToUpdate?.length) {
+          console.log('No conversations found for user:', userId);
+          return currentConversations;
+        }
+
+        console.log(
+          'Updating conversations for offline user:',
+          userId,
+          conversationsToUpdate
+        );
+
+        return currentConversations.map((conversation: IConversation) => {
+          const hasParticipant = conversation.participants.some(
+            (participant) => participant.id === userId
+          );
+
+          if (!hasParticipant) return conversation;
+
+          return {
+            ...conversation,
+            participants: conversation.participants.map((participant) =>
+              participant.id === userId
+                ? { ...participant, isOnline: false }
+                : participant
+            ),
+          };
+        });
+      });
     });
 
     // Cleanup function - disconnect socket and clear from store
@@ -107,7 +152,13 @@ export const useSocket = () => {
       newSocket.disconnect();
       setSocket(null);
     };
-  }, [user?.accessToken, user?.refreshToken, setSocket, setUser]);
+  }, [
+    user?.accessToken,
+    user?.refreshToken,
+    setSocket,
+    setUser,
+    setUserConversations,
+  ]);
 
   return { socket };
 };
