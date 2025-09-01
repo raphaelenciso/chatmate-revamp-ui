@@ -23,7 +23,7 @@ export const ChatPage = () => {
   const [isNewChatDialogOpen, setIsNewChatDialogOpen] = useState(false);
 
   const { postConversation, getConversations } = useConversationsApi();
-  const { postMessage } = useMessagesApi();
+  const { postMessage, getMessagesByConversationId } = useMessagesApi();
 
   const { socket } = useSocket();
   const currentUser = useAuthStore((state) => state.user);
@@ -60,11 +60,14 @@ export const ChatPage = () => {
       );
     }
 
+    console.log(existingContact);
+
     if (existingContact) {
       // If contact exists, just select it
       setActiveConversation(existingContact);
-      // const messages = await getMessages(existingContact.id);
-      // setMessages(messages.data as IMessage[]);
+      const messages = await getMessagesByConversationId(existingContact.id);
+      console.log(messages);
+      setMessages(messages.data);
     } else {
       // Temporary add to the conversations list
       setUserConversations([conversation, ...currentConversations]);
@@ -85,13 +88,20 @@ export const ChatPage = () => {
         },
       });
       setActiveConversation(response.data);
+    } else {
+      const response = await postMessage({
+        conversation: activeConversation.id,
+        sender: currentUser.id,
+        content,
+      });
+      setMessages((prev) => [...prev, response.data]);
+      // setUserConversations(
+      //   (prev) =>
+      //     prev.map((c) =>
+      //       c.id === activeConversation.id ? { ...c, lastMessage: content } : c
+      //     ) as IConversation[]
+      // );
     }
-
-    await postMessage({
-      conversation: activeConversation.id,
-      sender: currentUser.id,
-      content,
-    });
 
     // If it does, get the conversation id
     // Then send the message
@@ -111,11 +121,6 @@ export const ChatPage = () => {
     // }));
 
     // // Update contact's last message
-    // setUserContacts((prev) =>
-    //   prev.map((c) =>
-    //     c.id === activeContact.id ? { ...c, lastMessage: content } : c
-    //   )
-    // );
   };
 
   useEffect(() => {

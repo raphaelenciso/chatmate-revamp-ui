@@ -1,25 +1,21 @@
 import { formatTime } from '../../utils/dateHelpers';
 import type { IMessage } from '../../types/IMessage';
-import type { IUser } from '@/types/IUser';
+import { useChatContext } from './ChatContext';
 
 interface ChatMessageProps {
   message: IMessage;
-
-  userContact: IUser;
-  currentUserId: string;
 }
 
 /**
  * Reusable ChatMessage component for displaying individual chat messages
  * Handles different message types and styling based on sender
  */
-export const ChatMessage = ({ message, userContact }: ChatMessageProps) => {
-  const isAI =
-    message.sender.id === 'bot' ||
-    (message.sender.id === userContact?.id &&
-      userContact?.id === 'ai-assistant');
+export const ChatMessage = ({ message }: ChatMessageProps) => {
+  const { currentUserId } = useChatContext();
 
-  const isOwn = message.sender.id === userContact.id;
+  const isAI = message.sender.username === 'ai-assistant';
+
+  const isOwn = message.sender.id === currentUserId;
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
@@ -44,7 +40,7 @@ export const ChatMessage = ({ message, userContact }: ChatMessageProps) => {
             isOwn ? 'text-secondary' : 'text-muted-foreground'
           }`}
         >
-          {formatTime(message.timestamp)}
+          {formatTime(message.createdAt)}
         </p>
       </div>
     </div>

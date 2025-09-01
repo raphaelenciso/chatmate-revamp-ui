@@ -27,8 +27,16 @@ export const useConversationsApi = () => {
     return response.data;
   };
 
+  const getConversationById = async (id: string) => {
+    const response = await GET({
+      url: `/api/conversations/${id}`,
+    });
+    return response.data;
+  };
+
   return {
     postConversation,
     getConversations,
+    getConversationById,
   };
 };
