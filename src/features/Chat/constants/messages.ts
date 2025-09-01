@@ -34,7 +34,7 @@ export const mockMessages: { [contactId: string]: IMessage[] } = {
           },
         },
       },
-      timestamp: new Date(Date.now() - 3_600_000).toISOString(), // 1 hour ago
+      createdAt: new Date(Date.now() - 3_600_000).toISOString(), // 1 hour ago
       readBy: [],
     },
   ],
