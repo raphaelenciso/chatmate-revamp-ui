@@ -27,6 +27,7 @@ const ERROR_MESSAGES = {
   CONNECTION_FAILED: 'Connection failed',
   WEBSOCKET_CONNECTED: 'Websocket connected',
   CONNECTION_ERROR: 'Connection Error: ',
+  TOKEN_COMPROMISED: 'Token integrity compromised',
 } as const;
 
 /**
@@ -120,7 +121,10 @@ export const useSocket = () => {
         toast.error(`${ERROR_MESSAGES.CONNECTION_ERROR}${error.message}`);
 
         // Handle authentication errors
-        if (error.message === ERROR_MESSAGES.INVALID_ACCESS_TOKEN) {
+        if (
+          error.message === ERROR_MESSAGES.INVALID_ACCESS_TOKEN ||
+          error.message === ERROR_MESSAGES.TOKEN_COMPROMISED
+        ) {
           console.warn('Invalid access token detected, clearing user session');
           setUser(null);
         }
