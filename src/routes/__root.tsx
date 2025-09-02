@@ -31,7 +31,12 @@ const Root = () => {
   return (
     <div className={theme}>
       <Outlet />
-      <Toaster richColors expand={false} />
+      <Toaster
+        richColors
+        expand={false}
+        position="top-center"
+        duration={1500}
+      />
       {/* <TanStackRouterDevtools /> */}
     </div>
   );

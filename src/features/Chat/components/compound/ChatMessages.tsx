@@ -21,8 +21,6 @@ export const ChatMessages = () => {
 
   if (!conversation) return;
 
-  console.log(messages);
-
   return (
     <div className="h-full p-3 flex flex-col-reverse overflow-y-auto my-12 ">
       <div className="space-y-4">

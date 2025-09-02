@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { toast } from 'sonner';
@@ -7,6 +9,7 @@ import { useSocketStore } from '@/stores/socketStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useConversationsStore } from '../stores/conversationsStore';
 import type { IConversation } from '../types/IConversation';
+import type { IUser } from '@/types/IUser';
 
 // Socket event constants - Best practice to avoid typos and ensure consistency
 const SOCKET_EVENTS = {
@@ -42,8 +45,6 @@ const updateUserOnlineStatus = (
     });
     return currentConversations;
   }
-
-  console.log(`User ${userId} is now ${isOnline ? 'online' : 'offline'}`);
 
   // Early return if no conversations contain this user
   const hasUserInConversations = currentConversations.some((conversation) =>
@@ -83,7 +84,7 @@ interface SocketEventHandlers {
   onConnect: () => void;
   onConnectError: (error: Error) => void;
   onDisconnect: (reason: string) => void;
-  onTokenRefreshed: () => void;
+  onTokenRefreshed: (data: any) => void;
   onUserOnline: (userId: string) => void;
   onUserOffline: (userId: string) => void;
 }
@@ -106,8 +107,8 @@ export const useSocket = () => {
   const createEventHandlers = useCallback(
     (): SocketEventHandlers => ({
       onConnect: () => {
-        console.log('Socket connected successfully');
-        toast.success(ERROR_MESSAGES.WEBSOCKET_CONNECTED);
+        // toast.success(ERROR_MESSAGES.WEBSOCKET_CONNECTED);
+        console.log('socket connected');
       },
 
       onConnectError: (error: Error) => {
@@ -137,8 +138,16 @@ export const useSocket = () => {
         }
       },
 
-      onTokenRefreshed: () => {
-        console.log('Authentication tokens refreshed successfully');
+      onTokenRefreshed: (data: {
+        accessToken: string;
+        refreshToken: string;
+      }) => {
+        // Update socket auth with new tokens
+        setUser({
+          ...(user as IUser),
+          accessToken: data.accessToken,
+          refreshToken: data.refreshToken,
+        });
       },
 
       onUserOnline: (userId: string) => {
@@ -147,7 +156,6 @@ export const useSocket = () => {
           return;
         }
 
-        console.log('User came online:', userId);
         setUserConversations((currentConversations: IConversation[]) =>
           updateUserOnlineStatus(currentConversations, userId, true)
         );
@@ -159,13 +167,12 @@ export const useSocket = () => {
           return;
         }
 
-        console.log('User went offline:', userId);
         setUserConversations((currentConversations: IConversation[]) =>
           updateUserOnlineStatus(currentConversations, userId, false)
         );
       },
     }),
-    [setUser, setUserConversations]
+    [setUser, setUserConversations, user?.accessToken, user?.refreshToken]
   );
 
   // Socket connection management with enhanced error handling
@@ -175,8 +182,6 @@ export const useSocket = () => {
       console.log('User not authenticated, skipping socket connection');
       return;
     }
-
-    console.log('Initializing socket connection...');
 
     // Create socket with optimized configuration
     const newSocket: Socket = io(API_URL, {
@@ -188,6 +193,11 @@ export const useSocket = () => {
       timeout: 20_000,
       // Auto-connect
       autoConnect: true,
+      // Reconnection settings
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 5000, // Reconnect every 5 seconds
+      reconnectionDelayMax: 5000, // Cap max delay at 5 seconds
     });
 
     const handlers = createEventHandlers();

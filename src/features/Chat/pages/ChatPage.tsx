@@ -14,6 +14,7 @@ import { useMessagesApi } from '../api/messagesApi';
 import { useConversationsApi } from '../api/conversationsApi';
 import type { IConversation } from '../types/IConversation';
 import { useConversationsStore } from '../stores/conversationsStore';
+import { toast } from 'sonner';
 
 export const ChatPage = () => {
   const [activeConversation, setActiveConversation] = useState<
@@ -34,8 +35,16 @@ export const ChatPage = () => {
     (state) => state.setUserConversations
   );
 
-  const handleConversationSelect = (conversation: IConversation) => {
+  const handleConversationSelect = async (conversation: IConversation) => {
+    if (!socket) {
+      toast.error('Please wait for the socket to connect');
+      return;
+    }
+
     setActiveConversation(conversation);
+    const messages = await getMessagesByConversationId(conversation.id);
+    setMessages(messages.data);
+    socket.emit('join-conversation', conversation?.id);
     // Mark messages as read
     // if (userContact.unreadCount) {
     //   setUserContacts((prev) =>
@@ -46,7 +55,12 @@ export const ChatPage = () => {
     // }
   };
 
-  const handleOnConversationSelect = async (conversation: IConversation) => {
+  const handleOnNewConversationSelect = async (conversation: IConversation) => {
+    if (!socket) {
+      toast.error('Please wait for the socket to connect');
+      return;
+    }
+
     // Check if contact already exists
     // TODO: userconversation should paginated and this should be check on all users conversations
     let existingContact: IConversation | undefined;
@@ -60,14 +74,14 @@ export const ChatPage = () => {
       );
     }
 
-    console.log(existingContact);
+    // leave the conversation if it is not the same as the existing contact
+    if (activeConversation && activeConversation.id !== existingContact?.id) {
+      socket.emit('leave-conversation', activeConversation.id);
+    }
 
     if (existingContact) {
       // If contact exists, just select it
-      setActiveConversation(existingContact);
-      const messages = await getMessagesByConversationId(existingContact.id);
-      console.log(messages);
-      setMessages(messages.data);
+      handleConversationSelect(existingContact);
     } else {
       // Temporary add to the conversations list
       setUserConversations([conversation, ...currentConversations]);
@@ -77,7 +91,20 @@ export const ChatPage = () => {
   };
 
   const handleSendMessage = async (content: string) => {
-    if (!currentUser || !activeConversation) return;
+    if (!currentUser) {
+      toast.error('Please login to send messages');
+      return;
+    }
+
+    if (!activeConversation) {
+      toast.error('Please select a conversation first');
+      return;
+    }
+
+    if (!socket) {
+      toast.error('Please wait for the socket to connect');
+      return;
+    }
 
     if (activeConversation.id.includes('temporary')) {
       const response = await postConversation({
@@ -101,6 +128,7 @@ export const ChatPage = () => {
       //       c.id === activeConversation.id ? { ...c, lastMessage: content } : c
       //     ) as IConversation[]
       // );
+      socket.emit('send-message', response.data);
     }
 
     // If it does, get the conversation id
@@ -123,6 +151,16 @@ export const ChatPage = () => {
     // // Update contact's last message
   };
 
+  const handleBackClick = () => {
+    if (!socket) {
+      toast.error('Please wait for the socket to connect');
+      return;
+    }
+    setActiveConversation(undefined);
+    setMessages([]);
+    socket.emit('leave-conversation', activeConversation?.id);
+  };
+
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -142,10 +180,17 @@ export const ChatPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
+  useEffect(() => {
+    if (!socket) return;
+    socket.on('message-received', (message: IMessage) => {
+      setMessages((prev) => [...prev, message]);
+    });
+  }, [socket]);
+
   if (!socket) return <div>Loading...</div>;
 
   return (
-    <div className="h-screen max-h-screen flex gap-2 bg-muted p-3 overflow-hidden ">
+    <div className="h-dvh max-h-dvh flex gap-2 bg-muted p-3 overflow-hidden ">
       <ChatSidebar
         userConversations={userConversations || []}
         activeConversationId={activeConversation?.id}
@@ -162,7 +207,7 @@ export const ChatPage = () => {
         messages={messages}
         currentUserId={currentUser?.id || ''}
         onSendMessage={handleSendMessage}
-        onBackClick={() => setActiveConversation(undefined)}
+        onBackClick={handleBackClick}
         className={cn(
           'flex-[3] rounded-xl bg-background overflow-hidden',
           !activeConversation?.id && 'hidden sm:block'
@@ -173,7 +218,7 @@ export const ChatPage = () => {
       <NewChatDialog
         isOpen={isNewChatDialogOpen}
         setIsOpen={setIsNewChatDialogOpen}
-        onUserSelect={handleOnConversationSelect}
+        onUserSelect={handleOnNewConversationSelect}
       />
     </div>
   );

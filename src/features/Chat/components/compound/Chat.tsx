@@ -43,7 +43,6 @@ const ChatRoot = ({
   onSendMessage,
   className,
 }: ChatProps) => {
-  // Show welcome screen if no contact is selected
   if (!conversation) {
     return (
       <div

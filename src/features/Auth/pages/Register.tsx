@@ -95,7 +95,7 @@ export const RegisterPage = () => {
   // };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950">
+    <div className="min-h-dvh flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950 dark:via-indigo-950 dark:to-purple-950">
       <Card className="w-full max-w-md shadow-elegant hover-glow">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-1 mt-2">
